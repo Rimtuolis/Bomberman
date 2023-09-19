@@ -1,0 +1,12 @@
+C:\Users\Benas\source\repos\BomberGopnik\Shared\bin\Debug\net6.0\BomberGopnik.Shared.deps.json
+C:\Users\Benas\source\repos\BomberGopnik\Shared\bin\Debug\net6.0\BomberGopnik.Shared.dll
+C:\Users\Benas\source\repos\BomberGopnik\Shared\bin\Debug\net6.0\BomberGopnik.Shared.pdb
+C:\Users\Benas\source\repos\BomberGopnik\Shared\obj\Debug\net6.0\BomberGopnik.Shared.csproj.AssemblyReference.cache
+C:\Users\Benas\source\repos\BomberGopnik\Shared\obj\Debug\net6.0\BomberGopnik.Shared.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Benas\source\repos\BomberGopnik\Shared\obj\Debug\net6.0\BomberGopnik.Shared.AssemblyInfoInputs.cache
+C:\Users\Benas\source\repos\BomberGopnik\Shared\obj\Debug\net6.0\BomberGopnik.Shared.AssemblyInfo.cs
+C:\Users\Benas\source\repos\BomberGopnik\Shared\obj\Debug\net6.0\BomberGopnik.Shared.csproj.CoreCompileInputs.cache
+C:\Users\Benas\source\repos\BomberGopnik\Shared\obj\Debug\net6.0\BomberGopnik.Shared.dll
+C:\Users\Benas\source\repos\BomberGopnik\Shared\obj\Debug\net6.0\refint\BomberGopnik.Shared.dll
+C:\Users\Benas\source\repos\BomberGopnik\Shared\obj\Debug\net6.0\BomberGopnik.Shared.pdb
+C:\Users\Benas\source\repos\BomberGopnik\Shared\obj\Debug\net6.0\ref\BomberGopnik.Shared.dll
