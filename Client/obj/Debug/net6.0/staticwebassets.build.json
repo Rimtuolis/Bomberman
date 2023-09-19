@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "eNrj9hsAxNtQssdlngf+jSuRdtzhTcSptthrOzrHntg=",
+  "Hash": "qutqI0uSp14UMuz1KsPAkI6rJPj2EYhTMdUS9XSpNBE=",
   "Source": "BomberGopnik.Client",
   "BasePath": "/",
   "Mode": "Root",
@@ -7427,6 +7427,23 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\index.html"
+    },
+    {
+      "Identity": "C:\\Users\\Benas\\source\\repos\\BomberGopnik\\Client\\wwwroot\\scripts\\KeyboardEvents.js",
+      "SourceId": "BomberGopnik.Client",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\Benas\\source\\repos\\BomberGopnik\\Client\\wwwroot\\",
+      "BasePath": "/",
+      "RelativePath": "scripts/KeyboardEvents.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\scripts\\KeyboardEvents.js"
     }
   ]
 }

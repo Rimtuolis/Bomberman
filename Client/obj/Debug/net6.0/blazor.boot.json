@@ -204,15 +204,15 @@
       "mscorlib.dll": "sha256-TYLzIm125RbnX9+RAPqJnwZhd6CnQpJcrjiMpJfZ720=",
       "netstandard.dll": "sha256-HhuK9zDkd1N7hODAEiNJ11VF8T54IgrM6hZfLHmHdqM=",
       "System.Private.CoreLib.dll": "sha256-dXaTqyg1PnXPiSwywpic1PVrd7P8Vb5tN0i0\/urdt3E=",
-      "BomberGopnik.Shared.dll": "sha256-4Kw84XBRHePXcDNlURE6RrMUEOAfzsdbNGrpag7puTw=",
-      "BomberGopnik.Client.dll": "sha256-ooiTOvGCF0WWfMYBZDBkcwF2HBua7gumjE0b4HzRwwU="
+      "BomberGopnik.Shared.dll": "sha256-28KIWZoywq+Lb33cqvrQcOhcrkQJcEAo2FR8ZuAYiUg=",
+      "BomberGopnik.Client.dll": "sha256-yvH\/uMdafK9nEF6jTkFxeqgUBHBTqs9s\/CO92EXIzB8="
     },
     "extensions": null,
     "lazyAssembly": null,
     "libraryInitializers": null,
     "pdb": {
-      "BomberGopnik.Shared.pdb": "sha256-evUB8zMEgHFIzgJLaXDYwdJLM39pTLZTYbvcI8T9HyM=",
-      "BomberGopnik.Client.pdb": "sha256-2m3sDGXEKqcTka+C8FTm65iYM\/T2l6ExeImiTolKCOU="
+      "BomberGopnik.Shared.pdb": "sha256-YB7WvKmrGzS\/MEXos4PnA7Ka6NGbgccXATblT9peoqU=",
+      "BomberGopnik.Client.pdb": "sha256-pEoNKygDbD6iP9MxckbytVntwL5FqQocwLu5KzOeF5w="
     },
     "runtime": {
       "dotnet.6.0.8.ynws6cp4ly.js": "sha256-WT60vnXnQtCNURE40qo+XSL1o4iYFvABy0NVaFhm7MI=",

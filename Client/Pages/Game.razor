@@ -1,0 +1,102 @@
+﻿@page "/Game"
+@using Microsoft.AspNetCore.SignalR.Client
+@using BomberGopnik.Shared
+@inject NavigationManager Navigation
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+<PageTitle>Game</PageTitle>
+
+<div class="arena">
+    @foreach (var player in players)
+    {
+        <div class="player" style="top: @player.Top%; left: @player.Left%; background-color: @player.Color;"></div>
+    }
+</div>
+<button class="join-button" @onclick="JoinArena" disabled="@(!IsConnected && playerJoined)">Join Arena</button>
+
+
+
+
+@code {
+    private HubConnection? hubConnection;
+    private List<Player> players = new List<Player>();
+    bool playerJoined = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var lDotNetReference = DotNetObjectReference.Create(this);
+        await JS.InvokeVoidAsync("GLOBAL.SetDotnetReference", lDotNetReference);
+
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(Navigation.ToAbsoluteUri("/arenahub"))
+            .Build();
+
+        hubConnection.On<Player>("AssignPlayer", (player) =>
+        {
+            players.Add(player);
+            playerJoined = true;
+            StateHasChanged();
+        });
+
+        hubConnection.On<Player>("PlayerJoined", (player) =>
+        {
+            players.Add(player);
+            StateHasChanged(); 
+        });
+
+        await hubConnection.StartAsync();
+
+    }
+
+    private async Task JoinArena()
+    {
+        if (hubConnection is not null && !playerJoined)
+        {
+            await hubConnection.SendAsync("JoinArena");
+        }
+    }
+    [JSInvokable("KeyDown")]
+    public Task KeyDown(KeyboardEventArgs e)
+    {
+        Console.WriteLine(e.Code);
+        switch (e.Code) { 
+            case "37":
+                changeLocation(-10, 0);
+                break;
+            case "38":
+                changeLocation(0, -10);
+
+                break;
+            case "39":
+                changeLocation(10, 0);
+                break;
+            case "40":
+                changeLocation(0, 10);
+                break;
+            default: break;
+        }
+        return Task.CompletedTask;
+
+    }
+
+    private void changeLocation(int X, int Y) {
+        foreach (var player in players) {
+            player.Left += X;
+            player.Top += Y;
+            StateHasChanged();
+        }
+    }
+
+    public bool IsConnected =>
+        hubConnection?.State == HubConnectionState.Connected;
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
+}
+

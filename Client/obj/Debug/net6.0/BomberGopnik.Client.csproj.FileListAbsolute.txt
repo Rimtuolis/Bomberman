@@ -853,3 +853,4 @@ C:\Users\Benas\source\repos\BomberGopnik\Client\obj\Debug\net6.0\BomberGopnik.Cl
 C:\Users\Benas\source\repos\BomberGopnik\Client\obj\Debug\net6.0\refint\BomberGopnik.Client.dll
 C:\Users\Benas\source\repos\BomberGopnik\Client\obj\Debug\net6.0\BomberGopnik.Client.pdb
 C:\Users\Benas\source\repos\BomberGopnik\Client\obj\Debug\net6.0\ref\BomberGopnik.Client.dll
+C:\Users\Benas\source\repos\BomberGopnik\Client\obj\Debug\net6.0\scopedcss\Pages\Game.razor.rz.scp.css
