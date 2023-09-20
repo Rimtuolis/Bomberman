@@ -8,16 +8,15 @@ using Microsoft.JSInterop;
 
 public class ArenaHub : Hub
 {
-	private readonly List<Player> players = new List<Player>();
 	private readonly Random random = new Random();
 	public async Task JoinArena()
 	{
-		var existingPlayer = players.FirstOrDefault(p => p.ConnectionId == Context.ConnectionId);
+		var existingPlayer = PlayerManager.Players.FirstOrDefault(p => p.ConnectionId == Context.ConnectionId);
 		if (existingPlayer != null)
 		{
 			return; 
 		}
-
+		Console.WriteLine("BYBYS");
 		string[] colors = { "#ff0000", "#00ff00", "#0000ff", "#ffff00", "#ff00ff", "#00ffff" };
 		string playerColor = colors[random.Next(0, colors.Length)];
 
@@ -26,9 +25,15 @@ public class ArenaHub : Hub
 
 		var player = new Player(Context.ConnectionId, playerColor, playerTop, playerLeft);
 
-		players.Add(player);
+		PlayerManager.AddPlayer(player);
 
-		await Clients.Caller.SendAsync("AssignPlayer", players);
+		await Clients.Caller.SendAsync("AssignPlayer", PlayerManager.Players);
 		await Clients.Others.SendAsync("PlayerJoined", player);
 	}
+	public async Task MovePlayer(Player player) {
+		Console.WriteLine("aborigebnas");
+		PlayerManager.EditPlayer(player);
+		await Clients.All.SendAsync("PlayerMoved", PlayerManager.Players);
+	}
+
 }
