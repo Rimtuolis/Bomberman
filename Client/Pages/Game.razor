@@ -67,22 +67,34 @@
     public Task KeyDown(KeyboardEventArgs e)
     {
         Console.WriteLine(e.Code);
-        switch (e.Code)
+        foreach (var player in players)
         {
-            case "37":
-                changeLocation(-10, 0);
-                break;
-            case "38":
-                changeLocation(0, -10);
-
-                break;
-            case "39":
-                changeLocation(10, 0);
-                break;
-            case "40":
-                changeLocation(0, 10);
-                break;
-            default: break;
+            Console.WriteLine(player.Left + " " + player.Top);
+            switch (e.Code)
+            {
+              
+                case "37":
+                if (player.Left > 6){
+                    changeLocation(-1, 0);
+                }
+                    break;
+                case "38":
+                if (player.Top > 6){
+                    changeLocation(0, -1);
+                }
+                    break;
+                case "39":
+                if (player.Left < 94){
+                    changeLocation(1, 0);
+                }
+                    break;
+                case "40":
+                if (player.Top < 94){
+                    changeLocation(0, 1);
+                }
+                    break;
+                default: break;
+            }
         }
         return Task.CompletedTask;
 
