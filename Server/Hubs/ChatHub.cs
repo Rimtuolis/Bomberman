@@ -28,7 +28,7 @@ public class ArenaHub : Hub
 
 		players.Add(player);
 
-		await Clients.Caller.SendAsync("AssignPlayer", player);
+		await Clients.Caller.SendAsync("AssignPlayer", players);
 		await Clients.Others.SendAsync("PlayerJoined", player);
 	}
 }
