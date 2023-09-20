@@ -5,16 +5,17 @@ build_property.UsingMicrosoftNETSdkWeb = true
 build_property.ProjectTypeGuids = 
 build_property.InvariantGlobalization = 
 build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = BomberGopnik.Server
 build_property.RootNamespace = BomberGopnik.Server
-build_property.ProjectDir = C:\Users\Benas\source\repos\BomberGopnik\Server\
+build_property.ProjectDir = D:\PROJECTS\Server\
 build_property.RazorLangVersion = 6.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\Users\Benas\source\repos\BomberGopnik\Server
+build_property.MSBuildProjectDirectory = D:\PROJECTS\Server
 build_property._RazorSourceGeneratorDebug = 
 
-[C:/Users/Benas/source/repos/BomberGopnik/Server/Pages/Error.cshtml]
+[D:/PROJECTS/Server/Pages/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXJyb3IuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
