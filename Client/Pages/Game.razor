@@ -23,7 +23,7 @@
 
 @code {
     private HubConnection? hubConnection;
-    private List<Player> players = new List<Player>(); //to map
+    private List<Player> players = new List<Player>();
     bool playerJoined = false;
 
     protected override async Task OnInitializedAsync()
@@ -38,10 +38,7 @@
         hubConnection.On<List<Player>>("AssignPlayer", (existingPlayers) =>
         {
             Console.WriteLine("parejo");
-            foreach (var player in existingPlayers)
-            {
-                players.Add(player);
-            }
+            players = existingPlayers;
             playerJoined = true;
             StateHasChanged();
         });
@@ -54,7 +51,6 @@
 
         hubConnection.On<List<Player>>("PlayerMoved", (newPlayers) =>
         {
-            Console.WriteLine("ATEJO");
             players = newPlayers;
             StateHasChanged();
         });
@@ -75,50 +71,17 @@
     public async Task KeyDown(KeyboardEventArgs e)
     {
         Console.WriteLine(e.Code);
-        var existingPlayer = players.FirstOrDefault(p => p.ConnectionId == hubConnection.ConnectionId);
-
-        switch (e.Code)
-        {
-            case "37":
-                if (existingPlayer.Left > 6)
-                {
-                    await changeLocation(-1, 0, existingPlayer);
-                }
-                break;
-            case "38":
-                if (existingPlayer.Top > 6)
-                {
-                    await changeLocation(0, -1, existingPlayer);
-                }
-                break;
-            case "39":
-                if (existingPlayer.Left < 94)
-                {
-                    await changeLocation(1, 0, existingPlayer);
-                }
-                break;
-            case "40":
-                if (existingPlayer.Top < 94)
-                {
-                    await changeLocation(0, 1, existingPlayer);
-                }
-                break;
-
-            default: break;
-        }
-
-
-    }
-
-    private async Task changeLocation(int X, int Y, Player player)
-    {
-        Console.WriteLine('a');
-        if (hubConnection is not null && playerJoined)
-        {
-            Console.WriteLine('b');
-            player.Left += X;
-            player.Top += Y;
-            await hubConnection.SendAsync("MovePlayer", player);
+        if (hubConnection is not null && playerJoined) { 
+            var player = players.FirstOrDefault(p => p.ConnectionId == hubConnection.ConnectionId);
+            if (player == null)
+            {
+                Console.WriteLine($"BYBAS: {players.ToString()}");
+            }
+            else { 
+                Console.WriteLine(player.ConnectionId);
+            }
+            
+            await hubConnection.SendAsync("MovePlayer", player, e);
         }
     }
 

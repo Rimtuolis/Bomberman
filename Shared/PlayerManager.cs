@@ -8,28 +8,22 @@ namespace BomberGopnik.Shared
 {
 	public class PlayerManager
 	{
-		private static readonly List<Player> players = new List<Player>();
+		private static readonly Dictionary<String, Player> players = new Dictionary<string, Player>();
 		private static readonly object locker = new object();
 
-		public static List<Player> Players => players;
+		public static Dictionary<String, Player> Players => players;
 
 		public static void AddPlayer(Player player)
 		{
 			lock (locker)
 			{
-				players.Add(player);
+				players[player.ConnectionId] = player;
 			}
 		}
 
 		public static void EditPlayer(Player player)
 		{
-
-			int playerIndex = players.FindIndex(e => e.ConnectionId == player.ConnectionId);
-
-			if (playerIndex != -1) {
-				players[playerIndex] = player;
-			}
+			players[player.ConnectionId] = player;
 		}
-		// Add methods for removing players, updating player data, etc.
 	}
 }
