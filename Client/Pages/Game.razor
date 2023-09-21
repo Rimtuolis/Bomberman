@@ -37,7 +37,6 @@
 
         hubConnection.On<List<Player>>("AssignPlayer", (existingPlayers) =>
         {
-            Console.WriteLine("parejo");
             players = existingPlayers;
             playerJoined = true;
             StateHasChanged();
@@ -73,14 +72,6 @@
         Console.WriteLine(e.Code);
         if (hubConnection is not null && playerJoined) { 
             var player = players.FirstOrDefault(p => p.ConnectionId == hubConnection.ConnectionId);
-            if (player == null)
-            {
-                Console.WriteLine($"BYBAS: {players.ToString()}");
-            }
-            else { 
-                Console.WriteLine(player.ConnectionId);
-            }
-            
             await hubConnection.SendAsync("MovePlayer", player, e);
         }
     }
