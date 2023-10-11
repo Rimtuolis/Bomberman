@@ -11,5 +11,12 @@ namespace BomberGopnik.Shared
         public int StartX { get; set; }
         public int Length { get; set; }
         public int StartY { get; set; }
+
+        public BrickWall(int startX, int length, int startY)
+        {
+            StartX = startX;
+            Length = length;
+            StartY = startY;
+        }
     }
 }

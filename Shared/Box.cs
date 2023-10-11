@@ -12,5 +12,11 @@ namespace BomberGopnik.Shared
         public int Length { get; set; }
         public int StartY { get; set; }
 
+        public Box(int startX, int length, int startY)
+        {
+            StartX = startX;
+            Length = length;
+            StartY = startY;
+        }
     }
 }

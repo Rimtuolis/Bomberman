@@ -13,5 +13,15 @@ namespace BomberGopnik.Shared
         public int StartX { get; set; }
         public int Length { get; set; }
         public int StartY { get; set; }
+        public Bomb(int timer, int radius, int startX, int length, int startY)
+        {
+            Timer = timer;
+            Radius = radius;
+            StartX = startX;
+            Length = length;    
+            StartY = startY;
+
+        }
     }
+    
 }
