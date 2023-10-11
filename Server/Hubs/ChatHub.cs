@@ -23,7 +23,7 @@ public class ArenaHub : Hub
 			return;
 		}
 
-		string[] colors = { "#ff0000", "#00ff00", "#0000ff", "#ffff00", "#ff00ff", "#00ffff" };
+		string[] colors = {"#ff0000", "#00ff00", "#0000ff", "#ff00ff", "#00ffff"};
 		string playerColor = colors[random.Next(0, colors.Length)];
 
 		double playerTop = 50;
@@ -64,12 +64,13 @@ public class ArenaHub : Hub
 		{
 			case "32":
 				placeBomb(player, bomb);
-				break;
+                BombManager.Addbomb(bomb);
+                await Clients.Caller.SendAsync("PlayerPlacedBomb", bomb);
+                await Clients.Others.SendAsync("AllBombs", BombManager.Bombs.Values.ToList());
+                break;
 
 			default: break;
 		}
-        PlayerManager.EditPlayer(player);
-		await Clients.All.SendAsync("PlayerPlacedBomb", PlayerManager.Players.Values.ToList());
     }
 	private void changeLocation(int X, int Y, Player player)
 	{
@@ -103,7 +104,9 @@ public class ArenaHub : Hub
 	}
 	private void placeBomb(Player player, Bomb bomb)
 	{
-		bomb.StartX = player.Left;
+		Console.WriteLine(player.Left.ToString());
+        Console.WriteLine(player.Top.ToString());
+        bomb.StartX = player.Left;
 		bomb.StartY = player.Top;
 	}
 }
