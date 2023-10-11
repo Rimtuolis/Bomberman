@@ -24,6 +24,7 @@
 @code {
     private HubConnection? hubConnection;
     private List<Player> players = new List<Player>();
+    private List<Bomb> bombs = new List<Bomb>();
     bool playerJoined = false;
 
     protected override async Task OnInitializedAsync()
@@ -53,6 +54,12 @@
             players = newPlayers;
             StateHasChanged();
         });
+        hubConnection.On<List<Bomb>>("PlayerPlacedBomb", (newBombs) =>
+        {
+            bombs = newBombs;
+            StateHasChanged();
+        });
+
 
         await hubConnection.StartAsync();
 

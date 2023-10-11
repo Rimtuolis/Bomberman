@@ -24,6 +24,15 @@
     left: 50%; /* Center horizontally */
     transform: translate(-50%, -50%); /* Center the player element precisely */
 }
+.bomb {
+    width: 10px;
+    height: 10px;
+    background-color: #ff0000;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+}
+
 .join-button {
     margin-top: 20px; /* Add some space between arena and button */
     background-color: #007bff; /* Blue button color */

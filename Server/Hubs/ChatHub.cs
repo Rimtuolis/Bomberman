@@ -58,6 +58,19 @@ public class ArenaHub : Hub
 
 		await Clients.All.SendAsync("PlayerMoved", PlayerManager.Players.Values.ToList());
 	}
+	public async Task PlaceBomb(Player player, Bomb bomb, KeyboardEventArgs e)
+	{
+		switch (e.Code)
+		{
+			case "32":
+				placeBomb(player, bomb);
+				break;
+
+			default: break;
+		}
+        PlayerManager.EditPlayer(player);
+		await Clients.All.SendAsync("PlayerPlacedBomb", PlayerManager.Players.Values.ToList());
+    }
 	private void changeLocation(int X, int Y, Player player)
 	{
 		double valueX = player.Left + X;
@@ -87,5 +100,10 @@ public class ArenaHub : Hub
 				player.Top = valueY;
 				break;
 		}
+	}
+	private void placeBomb(Player player, Bomb bomb)
+	{
+		bomb.StartX = player.Left;
+		bomb.StartY = player.Top;
 	}
 }
