@@ -41,7 +41,7 @@
     padding: 10px 20px;
     cursor: pointer;
 }
-<<<<<<< HEAD
+
 .brick {
     width: 30px;
     height: 30px;
@@ -55,8 +55,7 @@
     background-color: #966F33;
     position: absolute;
     transform: translate(-50%, -50%);
-=======
-
+}
 .pause-button {
     margin-top: 20px; /* Add some space between arena and button */
     background-color: #007bff; /* Blue button color */
@@ -72,5 +71,4 @@
 .paused-player {
     font-size: large;
     color: red;
->>>>>>> 53a3d11550fdaf84bbf507760be143e7c56871d7
 }

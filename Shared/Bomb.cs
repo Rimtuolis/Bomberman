@@ -6,25 +6,9 @@ using System.Threading.Tasks;
 
 namespace BomberGopnik.Shared
 {
-    public class Bomb : Entity
+    public class Bomb 
     {
-<<<<<<< HEAD
-        public override int StartX { get; set; }
-        public override int Length { get; set; }
-        public override int StartY { get; set; }
-        public override int Timer { get; set; }
-        public override int Radius { get; set; }
-        public override int PlayerId { get; set; }
 
-        public Bomb(int startX, int length, int startY, int timer, int radius, int playerId)
-        {
-            this.StartX = startX;
-            this.Length = length;
-            this.StartY = startY;   
-            this.Timer = timer;
-            this.Radius = radius;
-            this.PlayerId = playerId;
-=======
         public string? Id { get; set; } 
         public int Timer { get; set; }
         public int Radius { get; set; }
@@ -39,8 +23,6 @@ namespace BomberGopnik.Shared
             StartX = startX;
             Length = length;    
             StartY = startY;
-
->>>>>>> 53a3d11550fdaf84bbf507760be143e7c56871d7
         }
         public Bomb() { }
     }

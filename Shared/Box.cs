@@ -13,7 +13,6 @@ namespace BomberGopnik.Shared
         public override int StartY { get; set; }
         public override int PowerUP { get; set; }
 
-<<<<<<< HEAD
         public Box(int startX, int startY, int length)
         {
             this.StartX = startX;
@@ -21,13 +20,6 @@ namespace BomberGopnik.Shared
             this.Length = length;
             this.PowerUP = 0;
 
-=======
-        public Box(int startX, int length, int startY)
-        {
-            StartX = startX;
-            Length = length;
-            StartY = startY;
->>>>>>> 53a3d11550fdaf84bbf507760be143e7c56871d7
         }
     }
 }

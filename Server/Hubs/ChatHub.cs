@@ -8,129 +8,126 @@ using Microsoft.JSInterop;
 
 public class ArenaHub : Hub
 {
-	private readonly Random random = new Random();
-	public async Task JoinArena()
-	{
-		Player? existingPlayer = null;
-
-		if (PlayerManager.Players.ContainsKey(Context.ConnectionId))
-		{
-			existingPlayer = PlayerManager.Players[Context.ConnectionId];
-		}
-
-		if (existingPlayer != null)
-		{
-			return;
-		}
-
-		string[] colors = {"#ff0000", "#00ff00", "#0000ff", "#ff00ff", "#00ffff"};
-		string playerColor = colors[random.Next(0, colors.Length)];
-
-		double playerTop = 50;
-		double playerLeft = 50;
-
-		var player = new Player(Context.ConnectionId, playerColor, playerTop, playerLeft);
-		PlayerManager.AddPlayer(player);
-
-
-		await Clients.Caller.SendAsync("AssignPlayer", PlayerManager.Players.Values.ToList());
-		await Clients.Others.SendAsync("PlayerJoined", player);
-	}
-<<<<<<< HEAD
-	public async Task MovePlayer(Player player,List<BrickWall> bricks, KeyboardEventArgs e)
-=======
-	public async Task PauseArena(Player player)
+    private readonly Random random = new Random();
+    public async Task JoinArena()
     {
-		await Clients.All.SendAsync("PauseArena", player);
-	}
+        Player? existingPlayer = null;
 
-	public async Task MovePlayer(Player player, KeyboardEventArgs e)
->>>>>>> 53a3d11550fdaf84bbf507760be143e7c56871d7
-	{
-		switch (e.Code)
-		{
-			case "37":
-				changeLocation(-5, 0, player, bricks);
-				break;
-			case "38":
-				changeLocation(0, -5, player, bricks);
-				break;
-			case "39":
-				changeLocation(5, 0, player, bricks);
-				break;
-			case "40":
-				changeLocation(0, 5, player, bricks);
-				break;
+        if (PlayerManager.Players.ContainsKey(Context.ConnectionId))
+        {
+            existingPlayer = PlayerManager.Players[Context.ConnectionId];
+        }
 
-			default: break;
-		}
-		PlayerManager.EditPlayer(player);
+        if (existingPlayer != null)
+        {
+            return;
+        }
 
-		await Clients.All.SendAsync("PlayerMoved", PlayerManager.Players.Values.ToList());
-	}
-<<<<<<< HEAD
-	private void changeLocation(int X, int Y, Player player, List<BrickWall> bricks)
-=======
-	public async Task PlaceBomb(Player player, Bomb bomb, KeyboardEventArgs e)
-	{
-		switch (e.Code)
-		{
-			case "32":
-				placeBomb(player, bomb);
+        string[] colors = { "#ff0000", "#00ff00", "#0000ff", "#ff00ff", "#00ffff" };
+        string playerColor = colors[random.Next(0, colors.Length)];
+
+        double playerTop = 50;
+        double playerLeft = 50;
+
+        var player = new Player(Context.ConnectionId, playerColor, playerTop, playerLeft);
+        PlayerManager.AddPlayer(player);
+
+
+        await Clients.Caller.SendAsync("AssignPlayer", PlayerManager.Players.Values.ToList());
+        await Clients.Others.SendAsync("PlayerJoined", player);
+    }
+
+    public async Task PauseArena(Player player)
+    {
+        await Clients.All.SendAsync("PauseArena", player);
+    }
+
+    public async Task MovePlayer(Player player, List<BrickWall> bricks, KeyboardEventArgs e)
+
+    {
+        switch (e.Code)
+        {
+            case "37":
+                changeLocation(-5, 0, player, bricks);
+                break;
+            case "38":
+                changeLocation(0, -5, player, bricks);
+                break;
+            case "39":
+                changeLocation(5, 0, player, bricks);
+                break;
+            case "40":
+                changeLocation(0, 5, player, bricks);
+                break;
+
+            default: break;
+        }
+        PlayerManager.EditPlayer(player);
+
+        await Clients.All.SendAsync("PlayerMoved", PlayerManager.Players.Values.ToList());
+    }
+
+
+    public async Task PlaceBomb(Player player, Bomb bomb, KeyboardEventArgs e)
+    {
+        switch (e.Code)
+        {
+            case "32":
+                placeBomb(player, bomb);
                 BombManager.Addbomb(bomb);
                 await Clients.Caller.SendAsync("PlayerPlacedBomb", bomb);
                 await Clients.Others.SendAsync("AllBombs", BombManager.Bombs.Values.ToList());
                 break;
 
-			default: break;
-		}
+            default: break;
+        }
     }
-	private void changeLocation(int X, int Y, Player player)
->>>>>>> 53a3d11550fdaf84bbf507760be143e7c56871d7
-	{
-		double valueX = player.Left + X;
-		double valueY = player.Top + Y;
-		bool legalMove = true;
-		foreach (var brick in bricks)
-		{
+    private void changeLocation(int X, int Y, Player player, List<BrickWall> bricks)
+
+    {
+        double valueX = player.Left + X;
+        double valueY = player.Top + Y;
+        bool legalMove = true;
+        foreach (var brick in bricks)
+        {
             /// Intervlas tarp startX <=  x  <= StartX + 6 and startY <=  Y  <= Starty    if sąlygą sukonstruoti
 			/// 
             if (valueX >= brick.StartX && valueX <= brick.StartX + 6 && valueY >= brick.StartY && valueY <= brick.StartY + 6)
-			{
-				legalMove = false;
+            {
+                legalMove = false;
             }
-			                                                    
+
         }
-		switch (valueX)
-		{
-			case < 6:
-				player.Left = 6;
-				break;
-			case > 94:
-				player.Left = 94;
-				break;
-			default:
-				if(legalMove) player.Left = valueX;
+        switch (valueX)
+        {
+            case < 6:
+                player.Left = 6;
                 break;
-		}
-		switch (valueY)
-		{
-			case < 6:
-				player.Top = 6;
-				break;
-			case > 94:
-				player.Top = 94;
-				break;
-			default:
+            case > 94:
+                player.Left = 94;
+                break;
+            default:
+                if (legalMove) player.Left = valueX;
+                break;
+        }
+        switch (valueY)
+        {
+            case < 6:
+                player.Top = 6;
+                break;
+            case > 94:
+                player.Top = 94;
+                break;
+            default:
                 if (legalMove) player.Top = valueY;
                 break;
-		}
-	}
-	private void placeBomb(Player player, Bomb bomb)
-	{
-		Console.WriteLine(player.Left.ToString());
+        }
+    }
+    private void placeBomb(Player player, Bomb bomb)
+    {
+        Console.WriteLine(player.Left.ToString());
         Console.WriteLine(player.Top.ToString());
         bomb.StartX = player.Left;
-		bomb.StartY = player.Top;
-	}
+        bomb.StartY = player.Top;
+    }
 }
