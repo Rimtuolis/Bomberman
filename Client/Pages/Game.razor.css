@@ -41,3 +41,20 @@
     padding: 10px 20px;
     cursor: pointer;
 }
+
+.pause-button {
+    margin-top: 20px; /* Add some space between arena and button */
+    background-color: #007bff; /* Blue button color */
+    color: #fff; /* White text color */
+    border: none;
+    padding: 10px 30px;
+    cursor: pointer;
+}
+.player-counter {
+    font-size: medium;
+    color: blue;
+}
+.paused-player {
+    font-size: large;
+    color: red;
+}

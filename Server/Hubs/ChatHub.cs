@@ -32,9 +32,15 @@ public class ArenaHub : Hub
 		var player = new Player(Context.ConnectionId, playerColor, playerTop, playerLeft);
 		PlayerManager.AddPlayer(player);
 
+
 		await Clients.Caller.SendAsync("AssignPlayer", PlayerManager.Players.Values.ToList());
 		await Clients.Others.SendAsync("PlayerJoined", player);
 	}
+	public async Task PauseArena(Player player)
+    {
+		await Clients.All.SendAsync("PauseArena", player);
+	}
+
 	public async Task MovePlayer(Player player, KeyboardEventArgs e)
 	{
 		switch (e.Code)

@@ -7,6 +7,17 @@
 
 <PageTitle>Game</PageTitle>
 
+
+<div>
+    <p class="player-counter">Players joined: @players.Count</p>
+</div>
+
+@if(arenaPaused)
+{
+    <div>
+            <p class="paused-player">@pausedPlayer.ConnectionId has paused the game</p>
+    </div>
+}
 <div class="arena">
     @foreach (var player in players)
     {
@@ -22,6 +33,17 @@
 {
     <button class="join-button" @onclick="JoinArena" disabled="@(!IsConnected && playerJoined)">Join Arena</button>
 }
+@if(playerJoined && IsConnected)
+{
+    @if(!arenaPaused)
+    {
+        <button class="pause-button" @onclick="PauseArena">Pause</button>
+    }
+    else if(arenaPaused)
+    {
+        <button class="pause-button" @onclick="PauseArena">Unpause</button>
+    }
+}
 
 
 
@@ -31,6 +53,8 @@
     private List<Player> players = new List<Player>();
     private List<Bomb> bombs = new List<Bomb>();
     bool playerJoined = false;
+    bool arenaPaused = false;
+    private Player pausedPlayer, tempPlayer;
 
     protected override async Task OnInitializedAsync()
     {
@@ -65,6 +89,12 @@
             bombs = newBombs;
             StateHasChanged();
         });
+        hubConnection.On<Player>("PauseArena", (player) =>
+        {
+            arenaPaused = !arenaPaused;
+            pausedPlayer = player;
+            StateHasChanged();
+        });
 
         hubConnection.On<Bomb>("PlayerPlacedBomb", (bomb) =>
         {
@@ -73,6 +103,19 @@
         });
         await hubConnection.StartAsync();
 
+    }
+    private async Task PauseArena()
+    {
+        var player = players.FirstOrDefault(p => p.ConnectionId == hubConnection.ConnectionId);
+        if (players.Count >= 2 && !arenaPaused)
+        {
+            tempPlayer = player;
+            await hubConnection.SendAsync("PauseArena", player);
+        }
+        else if(arenaPaused && player == tempPlayer)
+        {
+            await hubConnection.SendAsync("PauseArena", player);
+        }
     }
 
     private async Task JoinArena()
@@ -88,7 +131,7 @@
     {
 
         Console.WriteLine(e.Code);
-        if (hubConnection is not null && playerJoined) { 
+        if (hubConnection is not null && playerJoined && players.Count >= 2 && !arenaPaused) { 
             var player = players.FirstOrDefault(p => p.ConnectionId == hubConnection.ConnectionId);
             var bomb = new Bomb();
             bomb.Id = player.ConnectionId;
