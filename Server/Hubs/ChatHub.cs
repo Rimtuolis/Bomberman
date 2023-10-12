@@ -35,21 +35,21 @@ public class ArenaHub : Hub
 		await Clients.Caller.SendAsync("AssignPlayer", PlayerManager.Players.Values.ToList());
 		await Clients.Others.SendAsync("PlayerJoined", player);
 	}
-	public async Task MovePlayer(Player player, KeyboardEventArgs e)
+	public async Task MovePlayer(Player player,List<BrickWall> bricks, KeyboardEventArgs e)
 	{
 		switch (e.Code)
 		{
 			case "37":
-				changeLocation(-5, 0, player);
+				changeLocation(-5, 0, player, bricks);
 				break;
 			case "38":
-				changeLocation(0, -5, player);
+				changeLocation(0, -5, player, bricks);
 				break;
 			case "39":
-				changeLocation(5, 0, player);
+				changeLocation(5, 0, player, bricks);
 				break;
 			case "40":
-				changeLocation(0, 5, player);
+				changeLocation(0, 5, player, bricks);
 				break;
 
 			default: break;
@@ -58,11 +58,21 @@ public class ArenaHub : Hub
 
 		await Clients.All.SendAsync("PlayerMoved", PlayerManager.Players.Values.ToList());
 	}
-	private void changeLocation(int X, int Y, Player player)
+	private void changeLocation(int X, int Y, Player player, List<BrickWall> bricks)
 	{
 		double valueX = player.Left + X;
 		double valueY = player.Top + Y;
-
+		bool legalMove = true;
+		foreach (var brick in bricks)
+		{
+            /// Intervlas tarp startX <=  x  <= StartX + 6 and startY <=  Y  <= Starty    if sąlygą sukonstruoti
+			/// 
+            if (valueX >= brick.StartX && valueX <= brick.StartX + 6 && valueY >= brick.StartY && valueY <= brick.StartY + 6)
+			{
+				legalMove = false;
+            }
+			                                                    
+        }
 		switch (valueX)
 		{
 			case < 6:
@@ -72,8 +82,8 @@ public class ArenaHub : Hub
 				player.Left = 94;
 				break;
 			default:
-				player.Left = valueX;
-				break;
+				if(legalMove) player.Left = valueX;
+                break;
 		}
 		switch (valueY)
 		{
@@ -84,8 +94,8 @@ public class ArenaHub : Hub
 				player.Top = 94;
 				break;
 			default:
-				player.Top = valueY;
-				break;
+                if (legalMove) player.Top = valueY;
+                break;
 		}
 	}
 }

@@ -12,6 +12,14 @@
     {
         <div class="player" style="top: @player.Top%; left: @player.Left%; background-color: @player.Color;"></div>
     }
+    @foreach (var brick in bricks)
+    {
+        <div class="brick" style="top: @brick.StartX%; left: @brick.StartY%; width: @brick.Length%px; height: @brick.Length%px;"></div>
+    }
+    @foreach (var box in boxes)
+    {
+        <div class="box" style="top: @box.StartX%; left: @box.StartY%; width: @box.Length%px; height: @box.Length%px;"></div>
+    }
 </div>
 @if (!playerJoined)
 {
@@ -24,6 +32,18 @@
 @code {
     private HubConnection? hubConnection;
     private List<Player> players = new List<Player>();
+    private List<BrickWall> bricks = new List<BrickWall>
+    {
+      new BrickWall(20,20,30),
+      new BrickWall(40,40,30),
+      new BrickWall(80,80,30)
+    }; 
+    private List<Box> boxes = new List<Box>
+    {
+      new Box(90,10,30),
+      new Box(60,90,30)
+    };
+
     bool playerJoined = false;
 
     protected override async Task OnInitializedAsync()
@@ -72,7 +92,7 @@
         Console.WriteLine(e.Code);
         if (hubConnection is not null && playerJoined) { 
             var player = players.FirstOrDefault(p => p.ConnectionId == hubConnection.ConnectionId);
-            await hubConnection.SendAsync("MovePlayer", player, e);
+            await hubConnection.SendAsync("MovePlayer", player, bricks, e);
         }
     }
 
@@ -86,5 +106,6 @@
             await hubConnection.DisposeAsync();
         }
     }
+    
 }
 

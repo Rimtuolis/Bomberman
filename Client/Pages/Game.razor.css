@@ -32,3 +32,17 @@
     padding: 10px 20px;
     cursor: pointer;
 }
+.brick {
+    width: 30px;
+    height: 30px;
+    background-color: #AA4A44;
+    position: absolute;
+    transform: translate(-50%, -50%);
+}
+.box {
+    width: 30px;
+    height: 30px;
+    background-color: #966F33;
+    position: absolute;
+    transform: translate(-50%, -50%);
+}

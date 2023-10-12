@@ -6,11 +6,20 @@ using System.Threading.Tasks;
 
 namespace BomberGopnik.Shared
 {
-    public class Box
+    public class Box : Entity
     {
-        public int StartX { get; set; }
-        public int Length { get; set; }
-        public int StartY { get; set; }
+        public override int StartX { get; set; }
+        public override int Length { get; set; }
+        public override int StartY { get; set; }
+        public override int PowerUP { get; set; }
 
+        public Box(int startX, int startY, int length)
+        {
+            this.StartX = startX;
+            this.StartY = startY;
+            this.Length = length;
+            this.PowerUP = 0;
+
+        }
     }
 }
