@@ -23,7 +23,7 @@ public class ArenaHub : Hub
 			return;
 		}
 
-		string[] colors = { "#ff0000", "#00ff00", "#0000ff", "#ffff00", "#ff00ff", "#00ffff" };
+		string[] colors = {"#ff0000", "#00ff00", "#0000ff", "#ff00ff", "#00ffff"};
 		string playerColor = colors[random.Next(0, colors.Length)];
 
 		double playerTop = 50;
@@ -32,10 +32,20 @@ public class ArenaHub : Hub
 		var player = new Player(Context.ConnectionId, playerColor, playerTop, playerLeft);
 		PlayerManager.AddPlayer(player);
 
+
 		await Clients.Caller.SendAsync("AssignPlayer", PlayerManager.Players.Values.ToList());
 		await Clients.Others.SendAsync("PlayerJoined", player);
 	}
+<<<<<<< HEAD
 	public async Task MovePlayer(Player player,List<BrickWall> bricks, KeyboardEventArgs e)
+=======
+	public async Task PauseArena(Player player)
+    {
+		await Clients.All.SendAsync("PauseArena", player);
+	}
+
+	public async Task MovePlayer(Player player, KeyboardEventArgs e)
+>>>>>>> 53a3d11550fdaf84bbf507760be143e7c56871d7
 	{
 		switch (e.Code)
 		{
@@ -58,7 +68,25 @@ public class ArenaHub : Hub
 
 		await Clients.All.SendAsync("PlayerMoved", PlayerManager.Players.Values.ToList());
 	}
+<<<<<<< HEAD
 	private void changeLocation(int X, int Y, Player player, List<BrickWall> bricks)
+=======
+	public async Task PlaceBomb(Player player, Bomb bomb, KeyboardEventArgs e)
+	{
+		switch (e.Code)
+		{
+			case "32":
+				placeBomb(player, bomb);
+                BombManager.Addbomb(bomb);
+                await Clients.Caller.SendAsync("PlayerPlacedBomb", bomb);
+                await Clients.Others.SendAsync("AllBombs", BombManager.Bombs.Values.ToList());
+                break;
+
+			default: break;
+		}
+    }
+	private void changeLocation(int X, int Y, Player player)
+>>>>>>> 53a3d11550fdaf84bbf507760be143e7c56871d7
 	{
 		double valueX = player.Left + X;
 		double valueY = player.Top + Y;
@@ -97,5 +125,12 @@ public class ArenaHub : Hub
                 if (legalMove) player.Top = valueY;
                 break;
 		}
+	}
+	private void placeBomb(Player player, Bomb bomb)
+	{
+		Console.WriteLine(player.Left.ToString());
+        Console.WriteLine(player.Top.ToString());
+        bomb.StartX = player.Left;
+		bomb.StartY = player.Top;
 	}
 }

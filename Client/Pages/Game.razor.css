@@ -24,6 +24,15 @@
     left: 50%; /* Center horizontally */
     transform: translate(-50%, -50%); /* Center the player element precisely */
 }
+.bomb {
+    width: 10px;
+    height: 10px;
+    background-color: #ff0000;
+    border: dotted;
+    position: absolute;
+    transform: translate(-50%, -50%);
+}
+
 .join-button {
     margin-top: 20px; /* Add some space between arena and button */
     background-color: #007bff; /* Blue button color */
@@ -32,6 +41,7 @@
     padding: 10px 20px;
     cursor: pointer;
 }
+<<<<<<< HEAD
 .brick {
     width: 30px;
     height: 30px;
@@ -45,4 +55,22 @@
     background-color: #966F33;
     position: absolute;
     transform: translate(-50%, -50%);
+=======
+
+.pause-button {
+    margin-top: 20px; /* Add some space between arena and button */
+    background-color: #007bff; /* Blue button color */
+    color: #fff; /* White text color */
+    border: none;
+    padding: 10px 30px;
+    cursor: pointer;
+}
+.player-counter {
+    font-size: medium;
+    color: blue;
+}
+.paused-player {
+    font-size: large;
+    color: red;
+>>>>>>> 53a3d11550fdaf84bbf507760be143e7c56871d7
 }

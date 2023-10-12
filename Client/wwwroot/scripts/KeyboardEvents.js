@@ -15,7 +15,7 @@ GLOBAL.SetDotnetReference = function (pDotNetReference) {
                 shiftKey: e.shiftKey,
                 altKey: e.altKey,
                 metaKey: e.metaKey,
-                type: e.type
+                type: e.type 
             };
         }
     };
