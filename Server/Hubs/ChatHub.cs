@@ -87,6 +87,46 @@ public class ArenaHub : Hub
             default: break;
         }
     }
+
+    public async Task RemoveSpecialBomb(Player player, SpecialBomb bomb, KeyboardEventArgs e)
+    {
+        Receiver receiver = new Receiver();
+        ICommand command = new UndoAddSpecialBombCommand(receiver);
+
+        Invoker invoker = new Invoker();
+        switch (e.Code)
+        {
+            case "81":
+                invoker.SetCommand(command);
+                invoker.ExecuteCommand(bomb);
+                await Clients.Caller.SendAsync("PlayerRemovedSpecialBomb", bomb);
+                await Clients.All.SendAsync("AllSpecialBombs", Detonator.SpecialBombs.Values.ToList());
+                break;
+
+            default: break;
+        }
+    }
+
+
+    public async Task PlaceSpecialBomb(Player player, SpecialBomb bomb, KeyboardEventArgs e)
+    {
+        Receiver receiver = new Receiver();
+        ICommand command = new AddSpecialBombCommand(receiver);
+
+        Invoker invoker = new Invoker();
+        switch (e.Code)
+        {
+            case "69":
+                placeSpecialBomb(player, bomb);
+                invoker.SetCommand(command);
+                invoker.ExecuteCommand(bomb);
+                await Clients.Caller.SendAsync("PlayerPlacedSpecialBomb", bomb);
+                await Clients.Others.SendAsync("AllSpecialBombs", Detonator.SpecialBombs.Values.ToList());
+                break;
+
+            default: break;
+        }
+    }
     private void changeLocation(int X, int Y, Player player, List<BrickWall> bricks)
 
     {
@@ -132,6 +172,12 @@ public class ArenaHub : Hub
     {
         //Console.WriteLine(player.Left.ToString());
         //Console.WriteLine(player.Top.ToString());
+        bomb.StartX = player.Left;
+        bomb.StartY = player.Top;
+    }
+
+    private void placeSpecialBomb(Player player, SpecialBomb bomb)
+    {
         bomb.StartX = player.Left;
         bomb.StartY = player.Top;
     }
