@@ -92,7 +92,8 @@ public class ArenaHub : Hub
         {
             /// Intervlas tarp startX <=  x  <= StartX + 6 and startY <=  Y  <= Starty    if sąlygą sukonstruoti
 			/// 
-            if (valueX >= brick.StartX && valueX <= brick.StartX + 6 && valueY >= brick.StartY && valueY <= brick.StartY + 6)
+            if (valueX >= brick.GetStartX() && valueX <= brick.GetStartX() + 6 && valueY >= brick.GetStartY() && valueY <= brick.GetStartY() + 6 ||
+                valueX >= brick.GetStartX() - 6 && valueX <= brick.GetStartX() && valueY >= brick.GetStartY() - 6 && valueY <= brick.GetStartY())
             {
                 legalMove = false;
             }

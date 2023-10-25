@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace BomberGopnik.Shared
 {
-    public interface IPlayer
+    public interface IGameLevelBuilder
     {
-        void Move();
+        void BuildBricks();
+        void BuildBoxes();
+        GameLevel GetResult();
     }
 }
