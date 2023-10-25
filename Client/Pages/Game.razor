@@ -38,6 +38,10 @@
     {
         <div class="bomb" style="top: @bomb.StartY%; left: @bomb.StartX%;"></div>
     }
+    @foreach (var bomb in specialBombs)
+    {
+        <div class="specialBomb" style="top: @bomb.StartY%; left: @bomb.StartX%;"></div>
+    }
 
 </div>
 
@@ -86,7 +90,7 @@
     private HubConnection? hubConnection;
     private List<Player> players = new List<Player>();
     private List<Player> allPlayerScores = PlayerManager.Instance.GetAllPlayers();
-    
+
     private List<BrickWall> bricks = new List<BrickWall>
     {
       new BrickWall(20,20,30),
@@ -100,9 +104,10 @@
     };
 
     private List<Bomb> bombs = new List<Bomb>();
-    
+    private List<SpecialBomb> specialBombs = new List<SpecialBomb>();
     bool playerJoined = false;
     bool arenaPaused = false;
+    bool placedSpecialbomb = false;
     private Player pausedPlayer, tempPlayer;
 
     protected override async Task OnInitializedAsync()
@@ -154,6 +159,23 @@
             bombs.Add(bomb);
             StateHasChanged();
         });
+        hubConnection.On<List<SpecialBomb>>("AllSpecialBombs", (newBombs) =>
+        {
+            specialBombs = newBombs;
+            StateHasChanged();
+        });
+        hubConnection.On<SpecialBomb>("PlayerPlacedSpecialBomb", (bomb) =>
+        {
+            placedSpecialbomb = !placedSpecialbomb;
+            specialBombs.Add(bomb);
+            StateHasChanged();
+        });
+        hubConnection.On<SpecialBomb>("PlayerRemovedSpecialBomb", (bomb) =>
+        {
+            placedSpecialbomb = !placedSpecialbomb;
+            specialBombs.Remove(bomb);
+            StateHasChanged();
+        });
         await hubConnection.StartAsync();
 
     }
@@ -188,9 +210,20 @@
         {
             var player = players.FirstOrDefault(p => p.ConnectionId == hubConnection.ConnectionId);
             var bomb = new Bomb();
+            var specialBomb = new SpecialBomb();
             bomb.Id = player.ConnectionId;
+            specialBomb.Id = player.ConnectionId;
             await hubConnection.SendAsync("MovePlayer", player, bricks, e);
             await hubConnection.SendAsync("PlaceBomb", player, bomb, e);
+            if (!placedSpecialbomb)
+            {
+                await hubConnection.SendAsync("PlaceSpecialBomb", player, specialBomb, e);
+            }
+
+            if (placedSpecialbomb)
+            {
+                await hubConnection.SendAsync("RemoveSpecialBomb", player, specialBomb, e);
+            }
         }
     }
 

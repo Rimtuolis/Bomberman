@@ -43,6 +43,15 @@
     transform: translate(-50%, -50%);
 }
 
+.specialBomb {
+    width: 15px;
+    height: 10px;
+    background-color: green;
+    border: dotted;
+    position: absolute;
+    transform: translate(-50%, -50%);
+}
+
 .join-button {
     margin-top: 20px; /* Add some space between arena and button */
     background-color: #007bff; /* Blue button color */
