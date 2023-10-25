@@ -4,6 +4,7 @@ using BomberGopnik.Shared;
 namespace BomberGopnik.Server.Hubs;
 
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
 
 public class ArenaHub : Hub
@@ -12,7 +13,6 @@ public class ArenaHub : Hub
     public async Task JoinArena()
     {
         Player? existingPlayer = null;
-
         if (PlayerManager.Players.ContainsKey(Context.ConnectionId))
         {
             existingPlayer = PlayerManager.Players[Context.ConnectionId];
@@ -28,10 +28,11 @@ public class ArenaHub : Hub
 
         double playerTop = 50;
         double playerLeft = 50;
+        int points = 0;
 
-        var player = new Player(Context.ConnectionId, playerColor, playerTop, playerLeft);
+        var player = new Player(Context.ConnectionId, playerColor, playerTop, playerLeft, points);
+        
         PlayerManager.AddPlayer(player);
-
 
         await Clients.Caller.SendAsync("AssignPlayer", PlayerManager.Players.Values.ToList());
         await Clients.Others.SendAsync("PlayerJoined", player);
@@ -43,7 +44,6 @@ public class ArenaHub : Hub
     }
 
     public async Task MovePlayer(Player player, List<BrickWall> bricks, KeyboardEventArgs e)
-
     {
         switch (e.Code)
         {
@@ -75,8 +75,13 @@ public class ArenaHub : Hub
             case "32":
                 placeBomb(player, bomb);
                 BombManager.Addbomb(bomb);
-                await Clients.Caller.SendAsync("PlayerPlacedBomb", bomb);
+                PlayerManager.Instance.IncrementScore(player, 5);
+                //PlayerManager.EditPlayer(player); // player.Points
+                Console.WriteLine(player.ConnectionId + " : " + PlayerManager.Instance.GetScore(player) +  " : " + player.Points);
+                await Clients.All.SendAsync("PlayerPlacedBomb", bomb);
                 await Clients.Others.SendAsync("AllBombs", BombManager.Bombs.Values.ToList());
+                await Clients.All.SendAsync("PlayerMoved", PlayerManager.Players.Values.ToList());
+
                 break;
 
             default: break;
@@ -125,8 +130,8 @@ public class ArenaHub : Hub
     }
     private void placeBomb(Player player, Bomb bomb)
     {
-        Console.WriteLine(player.Left.ToString());
-        Console.WriteLine(player.Top.ToString());
+        //Console.WriteLine(player.Left.ToString());
+        //Console.WriteLine(player.Top.ToString());
         bomb.StartX = player.Left;
         bomb.StartY = player.Top;
     }

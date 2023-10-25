@@ -25,5 +25,50 @@ namespace BomberGopnik.Shared
 		{
 			players[player.ConnectionId] = player;
 		}
-	}
+        private static PlayerManager _instance;
+        
+        public static PlayerManager Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new PlayerManager();
+                }
+                return _instance;
+            }
+        }
+
+        public void IncrementScore(Player player, int points)
+        {
+            if (player != null)
+            {
+                
+                players[player.ConnectionId].Points += points;
+            }
+            else
+            {
+                Console.WriteLine("Player not found.");
+            }
+        }
+
+        public int GetScore(Player player)
+        {
+            if (player != null)
+            {
+                return players[player.ConnectionId].Points;
+
+            }
+            else
+            {
+                Console.WriteLine("Player not found.");
+                return 0;
+            }
+        }
+
+        public List<Player> GetAllPlayers()
+        {
+            return players.Values.ToList();
+        }
+    }
 }

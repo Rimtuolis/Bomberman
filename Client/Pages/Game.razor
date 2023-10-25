@@ -19,6 +19,7 @@
     </div>
 }
 <div class="arena">
+
     @foreach (var player in players)
     {
         <div class="player" style="top: @player.Top%; left: @player.Left%; background-color: @player.Color;"></div>
@@ -39,6 +40,10 @@
     }
 
 </div>
+
+
+
+
 @if (!playerJoined)
 {
     <button class="join-button" @onclick="JoinArena" disabled="@(!IsConnected && playerJoined)">Join Arena</button>
@@ -54,14 +59,34 @@
         <button class="pause-button" @onclick="PauseArena">Unpause</button>
     }
 }
+<div class="scoreboard">
+<table id="scoreboard">
+    <thead>
+        <tr>
+            <th>Scoreboard</th>
+        </tr>
+    </thead>
+    <tbody>
+       
+        @foreach (var player in allPlayerScores)
+        {
+            <tr>
+                <td>@player.ConnectionId : </td>
+                <th>@player.Points</th>
+            </tr>
+        }
+       
+    </tbody>
 
-
+</table>
+</div>
 
 
 @code {
     private HubConnection? hubConnection;
     private List<Player> players = new List<Player>();
-
+    private List<Player> allPlayerScores = PlayerManager.Instance.GetAllPlayers();
+    
     private List<BrickWall> bricks = new List<BrickWall>
     {
       new BrickWall(20,20,30),
@@ -75,6 +100,7 @@
     };
 
     private List<Bomb> bombs = new List<Bomb>();
+    
     bool playerJoined = false;
     bool arenaPaused = false;
     private Player pausedPlayer, tempPlayer;
@@ -91,6 +117,7 @@
         hubConnection.On<List<Player>>("AssignPlayer", (existingPlayers) =>
         {
             players = existingPlayers;
+            allPlayerScores = existingPlayers;
             playerJoined = true;
             StateHasChanged();
         });
@@ -103,7 +130,9 @@
 
         hubConnection.On<List<Player>>("PlayerMoved", (newPlayers) =>
         {
+            
             players = newPlayers;
+            allPlayerScores = newPlayers;
             StateHasChanged();
         });
         hubConnection.On<List<Bomb>>("AllBombs", (newBombs) =>
@@ -112,6 +141,7 @@
             bombs = newBombs;
             StateHasChanged();
         });
+
         hubConnection.On<Player>("PauseArena", (player) =>
         {
             arenaPaused = !arenaPaused;
