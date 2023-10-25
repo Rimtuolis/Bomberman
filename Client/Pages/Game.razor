@@ -26,11 +26,11 @@
 
     @foreach (var brick in bricks)
     {
-        <div class="brick" style="top: @brick.StartX%; left: @brick.StartY%; width: @brick.Length%px; height: @brick.Length%px;"></div>
+        <div class="brick" style="top: @brick.GetStartX()%; left: @brick.GetStartY()%; width: @brick.GetLength()%px; height: @brick.GetLength()%px;"></div>
     }
     @foreach (var box in boxes)
     {
-        <div class="box" style="top: @box.StartX%; left: @box.StartY%; width: @box.Length%px; height: @box.Length%px;"></div>
+        <div class="box" style="top: @box.GetStartX()%; left: @box.GetStartY()%; width: @box.GetLength()%px; height: @box.GetLength()%px;"></div>
     }
 
     @foreach (var bomb in bombs)
@@ -61,18 +61,10 @@
 @code {
     private HubConnection? hubConnection;
     private List<Player> players = new List<Player>();
-
-    private List<BrickWall> bricks = new List<BrickWall>
-    {
-      new BrickWall(20,20,30),
-      new BrickWall(40,40,30),
-      new BrickWall(80,80,30)
-    };
-    private List<Box> boxes = new List<Box>
-    {
-      new Box(90,10,30),
-      new Box(60,90,30)
-    };
+    private StructureFactory factory = new StructureFactory();
+    private IStructureFactory boxFactory = new BoxFactory();
+    private List<IStructure> bricks = new List<IStructure>();
+    private List<IStructure> boxes = new List<IStructure>();
 
     private List<Bomb> bombs = new List<Bomb>();
     bool playerJoined = false;
@@ -81,6 +73,12 @@
 
     protected override async Task OnInitializedAsync()
     {
+        bricks.Add(factory.CreateStructure("brickwall", 20, 20, 10));
+        bricks.Add(factory.CreateStructure("brickwall", 40, 40, 30));
+        bricks.Add(factory.CreateStructure("brickwall", 80, 80, 30));
+        boxes.Add(boxFactory.CreateStructure(90, 10, 30, 1));
+        boxes.Add(boxFactory.CreateStructure(60, 90, 30, 0));
+
         var lDotNetReference = DotNetObjectReference.Create(this);
         await JS.InvokeVoidAsync("GLOBAL.SetDotnetReference", lDotNetReference);
 
