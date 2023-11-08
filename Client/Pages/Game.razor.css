@@ -30,6 +30,7 @@
     height: 30px;
     background-color: #ff0000; /* Red player */
     position: absolute;
+    transition: top 0.5s, left 0.5s;
     top: 50%; /* Center vertically */
     left: 50%; /* Center horizontally */
     transform: translate(-50%, -50%); /* Center the player element precisely */

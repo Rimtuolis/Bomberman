@@ -75,11 +75,12 @@ public class ArenaHub : Hub
             case "32":
                 bomb.placeBomb(player);
                 BombManager.Addbomb(bomb);
+              
                 PlayerManager.Instance.IncrementScore(player, 5);
                 //PlayerManager.EditPlayer(player); // player.Points
                 Console.WriteLine(player.ConnectionId + " : " + PlayerManager.Instance.GetScore(player) +  " : " + player.Points);
                 await Clients.All.SendAsync("PlayerPlacedBomb", bomb);
-                await Clients.Others.SendAsync("AllBombs", BombManager.Bombs.Values.ToList());
+                await Clients.Others.SendAsync("AllBombs", BombManager.GetBombs());
                 await Clients.All.SendAsync("PlayerMoved", PlayerManager.Players.Values.ToList());
 
                 break;

@@ -1,4 +1,6 @@
-﻿namespace BomberGopnik.Shared
+﻿using System.Drawing;
+
+namespace BomberGopnik.Shared
 {
 	public class Player
     {
@@ -10,12 +12,13 @@
 
 		public Player(string connectionId, string color, double top, double left, int points)
 		{
-			ConnectionId = connectionId;
-			Color = color;
-			Top = top;
-			Left = left;
-			Points = points;
+			this.ConnectionId = connectionId;
+            this.Color = color;
+            this.Top = top;
+            this.Left = left;
+            this.Points = points;
 		}
-	}
+
+    }
 
 }

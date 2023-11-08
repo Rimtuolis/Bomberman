@@ -1,3 +1,4 @@
+using BomberGopnik.Server;
 using BomberGopnik.Server.Hubs;
 using Microsoft.AspNetCore.ResponseCompression;
 
@@ -15,6 +16,7 @@ builder.Services.AddResponseCompression(opts =>
 	   new[] { "application/octet-stream" });
 });
 
+builder.Services.AddHostedService<BombMonitor>();
 var app = builder.Build();
 app.UseResponseCompression();
 

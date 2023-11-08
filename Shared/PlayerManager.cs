@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace BomberGopnik.Shared
 {
+
 	public class PlayerManager
 	{
 		private static readonly Dictionary<String, Player> players = new Dictionary<string, Player>();
@@ -13,6 +14,28 @@ namespace BomberGopnik.Shared
 
 		public static Dictionary<String, Player> Players => players;
 
+       
+        public static async Task  bombMonitor()
+        {
+            while (true)
+            {
+
+                var bombs = BombManager.GetBombs();
+                foreach (var bomb in bombs)
+                {
+                    var diff = DateTime.Now - bomb.BombPlaced;
+                    Console.WriteLine(diff.TotalSeconds);
+                    if (diff.TotalMilliseconds >= 3000)
+                    {
+                        Console.WriteLine("removing");
+                        var temp = BombManager.Bombs.First(x => x.Value.First(y => y.Id == bomb.Id) != null);
+                        BombManager.Bombs.Remove(temp.Key);
+                    }
+
+                }
+            }
+            
+        }
 		public static void AddPlayer(Player player)
 		{
 			lock (locker)
@@ -20,8 +43,8 @@ namespace BomberGopnik.Shared
 				players[player.ConnectionId] = player;
 			}
 		}
-
-		public static void EditPlayer(Player player)
+       
+        public static void EditPlayer(Player player)
 		{
 			players[player.ConnectionId] = player;
 		}
