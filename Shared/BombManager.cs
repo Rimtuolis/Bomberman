@@ -21,7 +21,5 @@ namespace BomberGopnik.Shared
                 bombs[bomb.Id] = bomb;
             }
         }
-
-      
     }
 }

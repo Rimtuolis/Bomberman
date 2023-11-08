@@ -28,5 +28,12 @@ namespace BomberGopnik.Shared
                 specialBombs.Remove(bomb.Id);
             }
         }
+       /* public static void UseSpecialBomb(SpecialBomb bomb)
+        {
+            lock (locker)
+            {
+                specialBombs[bomb.Id].Explode();
+            }
+        }*/
     }
 }
