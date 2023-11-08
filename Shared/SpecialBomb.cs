@@ -6,23 +6,19 @@ using System.Threading.Tasks;
 
 namespace BomberGopnik.Shared
 {
-    public class SpecialBomb
+    public class SpecialBomb: Abstractbomb
     {
-        public string? Id { get; set; }
-        public int Timer { get; set; }
-        public int Radius { get; set; }
-        public double StartX { get; set; }
-        public int Length { get; set; }
-        public double StartY { get; set; }
-        public SpecialBomb(int timer, int radius, int startX, int length, int startY, string id)
+        public SpecialBomb(IBombImplementor implementor, int timer, int radius, int startX, int length, int startY, string id, double power) : base(implementor, timer, radius, startX, length, startY, id, power) { }
+
+        public SpecialBomb(IBombImplementor implementor) : base(implementor) { }
+        public SpecialBomb() 
         {
-            Id = id;
-            Timer = timer;
-            Radius = radius;
-            StartX = startX;
-            Length = length;
-            StartY = startY;
+            this.bombImplementor = new SpecialBombImplementor();
         }
-        public SpecialBomb() { }
+
+        public override void placeBomb(Player player)
+        {
+            bombImplementor.placeBomb(this, player);
+        }
     }
 }

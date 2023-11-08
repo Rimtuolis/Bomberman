@@ -73,7 +73,7 @@ public class ArenaHub : Hub
         switch (e.Code)
         {
             case "32":
-                placeBomb(player, bomb);
+                bomb.placeBomb(player);
                 BombManager.Addbomb(bomb);
                 PlayerManager.Instance.IncrementScore(player, 5);
                 //PlayerManager.EditPlayer(player); // player.Points
@@ -107,7 +107,6 @@ public class ArenaHub : Hub
         }
     }
 
-
     public async Task PlaceSpecialBomb(Player player, SpecialBomb bomb, KeyboardEventArgs e)
     {
         Receiver receiver = new Receiver();
@@ -117,7 +116,7 @@ public class ArenaHub : Hub
         switch (e.Code)
         {
             case "69":
-                placeSpecialBomb(player, bomb);
+                bomb.placeBomb(player);
                 invoker.SetCommand(command);
                 invoker.ExecuteCommand(bomb);
                 await Clients.Caller.SendAsync("PlayerPlacedSpecialBomb", bomb);
@@ -167,18 +166,5 @@ public class ArenaHub : Hub
                 if (legalMove) player.Top = valueY;
                 break;
         }
-    }
-    private void placeBomb(Player player, Bomb bomb)
-    {
-        //Console.WriteLine(player.Left.ToString());
-        //Console.WriteLine(player.Top.ToString());
-        bomb.StartX = player.Left;
-        bomb.StartY = player.Top;
-    }
-
-    private void placeSpecialBomb(Player player, SpecialBomb bomb)
-    {
-        bomb.StartX = player.Left;
-        bomb.StartY = player.Top;
     }
 }
