@@ -1,0 +1,35 @@
+﻿@using BomberGopnik.Shared
+@inject NavigationManager Navigation
+@page "/Gameover"
+
+
+<div class="game-over-container">
+    <h1>Game Over</h1>
+    <div class="@MessageCssClass">@DecoratedMessage</div>
+
+    <button @onclick="RedirectToGame">Start New Game</button>
+</div>
+
+@code {
+    private string DecoratedMessage = "Try again!";
+    private string MessageCssClass = "message";
+
+    private IGameOverScreenDecorator decorator = new WinningDecorator();
+
+    protected override void OnInitialized()
+    {
+        DecoratedMessage = decorator.DecorateMessage(DecoratedMessage);
+        if (decorator is WinningDecorator)
+        {
+            MessageCssClass = "message winning";
+        }
+        else
+        {
+            MessageCssClass = "message losing";
+        }
+    }
+    private void RedirectToGame()
+    {
+        Navigation.NavigateTo("/game");
+    }
+}
