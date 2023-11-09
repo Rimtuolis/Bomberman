@@ -30,8 +30,8 @@ public class ArenaHub : Hub, IArenaHub
         string[] colors = { "#ff0000", "#00ff00", "#0000ff", "#ff00ff", "#00ffff" };
         string playerColor = colors[random.Next(0, colors.Length)];
 
-        double playerTop = 50;
-        double playerLeft = 50;
+        int playerTop = 50;
+		int playerLeft = 50;
         int points = 0;
 
         var player = new Player(Context.ConnectionId, playerColor, playerTop, playerLeft, points);

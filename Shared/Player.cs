@@ -8,13 +8,15 @@ namespace BomberGopnik.Shared
 		public string? Color { get; set; }
 		public int Top { get; set; }
 		public int Left { get; set; }
+		public int Points { get; set; }
 
-		public Player(string connectionId, string color, int top, int left)
+		public Player(string connectionId, string color, int top, int left, int points)
 		{
 			ConnectionId = connectionId;
 			Color = color;
 			Top = top;
 			Left = left;
+			Points = points;
 		}
     }
 }
