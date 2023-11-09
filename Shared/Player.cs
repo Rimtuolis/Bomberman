@@ -10,6 +10,16 @@ namespace BomberGopnik.Shared
 		public int Left { get; set; }
 		public int Points { get; set; }
 		public bool IsPaused { get; set; }
+		
+		IBombExplosionStrategy BombExplosionStrategy { get; set; }
+
+		public void setBombExplosionStrategy(IBombExplosionStrategy strategy) {
+			BombExplosionStrategy = strategy;
+		}
+
+		public int[,] executeStrategy() {
+			return BombExplosionStrategy.Explode();
+		}
 
 		public Player(string connectionId, string color, int top, int left, int points)
 		{

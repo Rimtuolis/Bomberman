@@ -8,9 +8,11 @@ namespace BomberGopnik.Shared
 {
     internal class SimpleExplosionStrategy : IBombExplosionStrategy
     {
-        public void Explode(Bomb bomb)
+        public int[,] Explode()
         {
-            throw new NotImplementedException();
-        }
+			int[,] temp = { { 0, 0, 1, 0, 0 }, { 0, 0, 1, 0, 0 }, { 1, 1, 1, 1, 1 }, { 0, 0, 1, 0, 0 }, { 0, 0, 1, 0, 0 } };
+
+			return temp;
+		}
     }
 }

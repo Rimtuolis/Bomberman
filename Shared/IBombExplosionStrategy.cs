@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace BomberGopnik.Shared
 {
-    public interface IBombExplosion
+    public interface IBombExplosionStrategy
     {
-        public void Explode(Bomb bomb);
+        public int[,] Explode();
     }
 }

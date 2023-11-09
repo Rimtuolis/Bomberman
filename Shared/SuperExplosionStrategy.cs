@@ -8,10 +8,6 @@ namespace BomberGopnik.Shared
 {
     public class SuperExplosionStrategy : IBombExplosionStrategy
     {
-        public SuperExplosionStrategy()
-        {
-        }
-
         public int[,] Explode()
         {
 			int[,] temp = { { 1, 1, 1, 1, 1 }, { 0, 0, 1, 0, 0 }, { 1, 1, 1, 1, 1 }, { 0, 0, 1, 0, 0 }, { 1, 1, 1, 1, 1 } };
