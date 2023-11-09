@@ -24,7 +24,7 @@ namespace BomberGopnik.Shared
 
         public override void placeBomb(Player player)
         {
-            Path = player.executeStrategy();
+             Path = player.executeStrategy();
             bombImplementor.placeBomb(this, player);
         }
     }

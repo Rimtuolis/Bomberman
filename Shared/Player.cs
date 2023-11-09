@@ -28,6 +28,7 @@ namespace BomberGopnik.Shared
 			Top = top;
 			Left = left;
 			Points = points;
+			BombExplosionStrategy = new SimpleExplosionStrategy();
 		}
         public override bool Equals(Object obj)
         {
