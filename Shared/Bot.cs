@@ -6,9 +6,13 @@ using System.Threading.Tasks;
 
 namespace BomberGopnik.Shared
 {
-	public interface IBot
+	public abstract class Bot
 	{
-		public void PerformAction(GameLevel level, Player player);
-		public IBot Clone();
+		public int Top { get; set; }
+		public int Left { get; set; }
+		public string Color { get; set; }
+
+		public abstract void PerformAction(GameLevel level, Player player);
+		public abstract Bot Clone();
 	}
 }

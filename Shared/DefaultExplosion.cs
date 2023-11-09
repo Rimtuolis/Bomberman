@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace BomberGopnik.Shared
 {
-    internal class DefaultExplosion : IBombExplosion
+    internal class DefaultExplosion : IBombExplosionStrategy
     {
-        public void Explode(Bomb bomb)
+        public int[,] Explode()
         {
-            
+            throw new NotImplementedException();
         }
     }
 }
