@@ -6,17 +6,29 @@ using System.Threading.Tasks;
 
 namespace BomberGopnik.Shared
 {
-    public class BrickWall : Entity
+    public class BrickWall : IStructure
     {
-        public override int StartX { get; set; }
-        public override int Length { get; set; }
-        public override int StartY { get; set; }
+        public int StartX { get; set; }
+        public int Length { get; set; }
+        public int StartY { get; set; }
 
-        public BrickWall(int startX, int startY, int length)
+        public void Build()
         {
-            this.StartX = startX;
-            this.StartY = startY;
-            this.Length = length;
+            Console.WriteLine("Brick was built");
+        }
+        public int GetLength()
+        {
+            return Length;
+        }
+
+        public int GetStartX()
+        {
+            return StartX;
+        }
+
+        public int GetStartY()
+        {
+            return StartY;
         }
     }
 }

@@ -1,3 +1,4 @@
+using BomberGopnik.Server;
 using BomberGopnik.Server.Hubs;
 using Microsoft.AspNetCore.ResponseCompression;
 
@@ -14,7 +15,8 @@ builder.Services.AddResponseCompression(opts =>
 	opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
 	   new[] { "application/octet-stream" });
 });
-
+builder.Services.AddSingleton<IArenaHub, ArenaHub>();
+builder.Services.AddHostedService<LiveMonitoring>();
 var app = builder.Build();
 app.UseResponseCompression();
 

@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32804.467
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BomberGopnik.Server", "Server\BomberGopnik.Server.csproj", "{D53F6906-6E78-4629-A446-700EB3538FDF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BomberGopnik.Server", "Server\BomberGopnik.Server.csproj", "{D53F6906-6E78-4629-A446-700EB3538FDF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BomberGopnik.Client", "Client\BomberGopnik.Client.csproj", "{FFDAC0AA-F913-4B0F-9CBB-0E1CA5BD9F68}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BomberGopnik.Client", "Client\BomberGopnik.Client.csproj", "{FFDAC0AA-F913-4B0F-9CBB-0E1CA5BD9F68}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BomberGopnik.Shared", "Shared\BomberGopnik.Shared.csproj", "{A7FB354A-D193-4E93-83F0-737B37E40F19}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BomberGopnik.Shared", "Shared\BomberGopnik.Shared.csproj", "{A7FB354A-D193-4E93-83F0-737B37E40F19}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

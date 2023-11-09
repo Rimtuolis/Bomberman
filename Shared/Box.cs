@@ -6,20 +6,31 @@ using System.Threading.Tasks;
 
 namespace BomberGopnik.Shared
 {
-    public class Box : Entity
+    public class Box : IStructure
     {
-        public override int StartX { get; set; }
-        public override int Length { get; set; }
-        public override int StartY { get; set; }
-        public override int PowerUP { get; set; }
+        public int StartX { get; set; }
+        public int Length { get; set; }
+        public int StartY { get; set; }
+        public int PowerUp { get; set; }
 
-        public Box(int startX, int startY, int length)
+        public void Build()
         {
-            this.StartX = startX;
-            this.StartY = startY;
-            this.Length = length;
-            this.PowerUP = 0;
+            Console.WriteLine("Box was built");
+        }
 
+        public int GetLength()
+        {
+            return Length;
+        }
+
+        public int GetStartX()
+        {
+            return StartX;
+        }
+
+        public int GetStartY()
+        {
+            return StartY;
         }
     }
 }
