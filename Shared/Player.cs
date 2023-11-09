@@ -4,10 +4,10 @@
     {
 		public string? ConnectionId { get; set; }
 		public string? Color { get; set; }
-		public double Top { get; set; }
-		public double Left { get; set; }
+		public int Top { get; set; }
+		public int Left { get; set; }
 
-		public Player(string connectionId, string color, double top, double left)
+		public Player(string connectionId, string color, int top, int left)
 		{
 			ConnectionId = connectionId;
 			Color = color;

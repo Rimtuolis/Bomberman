@@ -1,21 +1,16 @@
 ﻿@page "/OfflineGame"
 @using Microsoft.AspNetCore.SignalR.Client
+@using System.Timers
 @using BomberGopnik.Shared
 @inject NavigationManager Navigation
-@implements IAsyncDisposable
 @inject IJSRuntime JS
 
 <PageTitle>Game</PageTitle>
 
-
-<div>
-    <p class="player-counter">Players joined: @players.Count</p>
-</div>
-
 @if (arenaPaused)
 {
     <div>
-        <p class="paused-player">@pausedPlayer.ConnectionId has paused the game</p>
+        <p class="paused-player">Player has paused the game</p>
     </div>
 }
 
@@ -35,9 +30,10 @@
 else
 {
     <div class="arena">
-        @foreach (var player in players)
+        <div class="player" style="top: @player.Top%; left: @player.Left%; background-color: @player.Color;"></div>
+        @foreach (var bot in bots)
         {
-            <div class="player" style="top: @player.Top%; left: @player.Left%; background-color: @player.Color;"></div>
+            <div class="player" style="top: @bot.Top%; left: @bot.Left%; background-color: @bot.Color;"></div>
         }
         @foreach (var brick in easyLevel.Bricks)
         {
@@ -54,20 +50,13 @@ else
         }
 
     </div>
-    @if (!playerJoined)
+    @if (!arenaPaused)
     {
-        <button class="join-button" @onclick="JoinArena" disabled="@(!IsConnected && playerJoined)">Join Arena</button>
+        <button class="pause-button" @onclick="PauseArena">Pause</button>
     }
-    @if (playerJoined && IsConnected)
+    else if (arenaPaused)
     {
-        @if (!arenaPaused)
-        {
-            <button class="pause-button" @onclick="PauseArena">Pause</button>
-        }
-        else if (arenaPaused)
-        {
-            <button class="pause-button" @onclick="PauseArena">Unpause</button>
-        }
+        <button class="pause-button" @onclick="PauseArena">Unpause</button>
     }
 }
 
@@ -78,130 +67,135 @@ else
 @code {
     private bool GameStarted = false;
 
-    private HubConnection? hubConnection;
-    private List<Player> players = new List<Player>();
     private IGameLevelBuilder builder = new EasyGameLevelBuilder();
     private GameLevel easyLevel = new GameLevel();
-    private string SelectedDifficulty;
-
+    private string SelectedDifficulty = "easy";
+    private Player player;
+    private List<Bot> bots = new List<Bot>();
     private List<Bomb> bombs = new List<Bomb>();
-    bool playerJoined = false;
+    private int cnt = 0;
+
     bool arenaPaused = false;
-    private Player pausedPlayer, tempPlayer;
+    private Timer timer;
 
     protected override async Task OnInitializedAsync()
     {
+        timer = new Timer();
+        timer.Interval = 16;
+        timer.Elapsed += TimerElapsed;
+        timer.AutoReset = true;
+        timer.Enabled = true;
         builder.BuildBoxes();
         builder.BuildBricks();
         easyLevel = builder.GetResult();
         var lDotNetReference = DotNetObjectReference.Create(this);
         await JS.InvokeVoidAsync("GLOBAL.SetDotnetReference", lDotNetReference);
-
-        hubConnection = new HubConnectionBuilder()
-            .WithUrl(Navigation.ToAbsoluteUri("/arenahub"))
-            .Build();
-
-        hubConnection.On<List<Player>>("AssignPlayer", (existingPlayers) =>
-        {
-            players = existingPlayers;
-            playerJoined = true;
-            StateHasChanged();
-        });
-
-        hubConnection.On<Player>("PlayerJoined", (player) =>
-        {
-            players.Add(player);
-            StateHasChanged();
-        });
-
-        hubConnection.On<List<Player>>("PlayerMoved", (newPlayers) =>
-        {
-            players = newPlayers;
-            StateHasChanged();
-        });
-        hubConnection.On<List<Bomb>>("AllBombs", (newBombs) =>
-        {
-
-            bombs = newBombs;
-            StateHasChanged();
-        });
-        hubConnection.On<Player>("PauseArena", (player) =>
-        {
-            arenaPaused = !arenaPaused;
-            pausedPlayer = player;
-            StateHasChanged();
-        });
-
-        hubConnection.On<Bomb>("PlayerPlacedBomb", (bomb) =>
-        {
-            bombs.Add(bomb);
-            StateHasChanged();
-        });
-        await hubConnection.StartAsync();
-
     }
 
     private void StartGame()
     {
         GameStarted = true;
+        player = new Player("", "800000", 50, 50);
+        Bot hard = new HardBot();
 
-        //Create a game with level and bots with specified difficulty
+        hard.Top = 20;
+
+        bots.Add(hard);
+        bots.Add(hard.Clone());
+
+        Bot ez = new EasyBot();
+
+        ez.Top = 80;
+
+
+        bots.Add(ez);
+        bots.Add(ez.Clone());
+
     }
 
     private async Task PauseArena()
     {
-        var player = players.FirstOrDefault(p => p.ConnectionId == hubConnection.ConnectionId);
-        if (players.Count >= 2 && !arenaPaused)
-        {
-            tempPlayer = player;
-            await hubConnection.SendAsync("PauseArena", player);
-        }
-        else if (arenaPaused && player == tempPlayer)
-        {
-            await hubConnection.SendAsync("PauseArena", player);
-        }
+        arenaPaused = !arenaPaused;
     }
 
-    private async Task JoinArena()
-    {
-        if (hubConnection is not null && !playerJoined)
-        {
-            playerJoined = true;
-            await hubConnection.SendAsync("JoinArena");
-        }
-    }
     [JSInvokable("KeyDown")]
     public async Task KeyDown(KeyboardEventArgs e)
     {
-
-        Console.WriteLine(e.Code);
-        if (hubConnection is not null && playerJoined && players.Count >= 2 && !arenaPaused)
+        if (GameStarted && !arenaPaused)
         {
-            var player = players.FirstOrDefault(p => p.ConnectionId == hubConnection.ConnectionId);
-            var bomb = new Bomb();
-            bomb.Id = player.ConnectionId;
+            IMovement movement = CreateMovement(e);
+            handleMovement(movement);
 
-            await hubConnection.SendAsync("MovePlayer", player, easyLevel.Bricks, e);
-            await hubConnection.SendAsync("PlaceBomb", player, bomb, e);
         }
     }
 
-    public bool IsConnected =>
-        hubConnection?.State == HubConnectionState.Connected;
+    private void handleMovement(IMovement movement) { 
+        int valueX = player.Left + movement.Dx;
+        int valueY = player.Top + movement.Dy;
+        bool legalMove = true;
 
-    public async ValueTask DisposeAsync()
-    {
-        if (hubConnection is not null)
+        foreach (var brick in easyLevel.Bricks)
         {
-            await hubConnection.DisposeAsync();
+
+            if (valueX >= brick.GetStartX() && valueX <= brick.GetStartX() + 6 && valueY >= brick.GetStartY() && valueY <= brick.GetStartY() + 6 ||
+                valueX >= brick.GetStartX() - 6 && valueX <= brick.GetStartX() && valueY >= brick.GetStartY() - 6 && valueY <= brick.GetStartY())
+            {
+                legalMove = false;
+            }
+
+        }
+        switch (valueX)
+        {
+            case < 6:
+                player.Left = 6;
+                break;
+            case > 94:
+                player.Left = 94;
+                break;
+            default:
+                if (legalMove) player.Left = valueX;
+                break;
+        }
+        switch (valueY)
+        {
+            case < 6:
+                player.Top = 6;
+                break;
+            case > 94:
+                player.Top = 94;
+                break;
+            default:
+                if (legalMove) player.Top = valueY;
+                break;
         }
     }
-    public class Lobby
+    private IMovement CreateMovement(KeyboardEventArgs e)
     {
-        public int Id { get; set; }
-        public int LevelCount { get; set; }
-        public string HostPlayer { get; set; }
-        public List<string> Players { get; set; }
+        if (IsArrowKey(e.Code))
+        {
+            return new ArrowKeyMovement(e);
+        }
+
+        return new WASDKeyMovement(e);
+    }
+
+    bool IsArrowKey(String e) => e.Equals("37") || e.Equals("38") || e.Equals("39") || e.Equals("40");
+
+    private void TimerElapsed(Object source, System.Timers.ElapsedEventArgs e)
+    {
+        Update();
+        this.StateHasChanged();
+    }
+    private void Update()
+    {
+        if (cnt % 5 == 0 && !arenaPaused) { 
+            foreach (Bot temp in bots)
+            {
+                temp.PerformAction(easyLevel, player);
+            }
+        }
+
+        cnt++;
     }
 }
 

@@ -26,8 +26,8 @@ public class ArenaHub : Hub
         string[] colors = { "#ff0000", "#00ff00", "#0000ff", "#ff00ff", "#00ffff" };
         string playerColor = colors[random.Next(0, colors.Length)];
 
-        double playerTop = 50;
-        double playerLeft = 50;
+        int playerTop = 50;
+		int playerLeft = 50;
 
         var player = new Player(Context.ConnectionId, playerColor, playerTop, playerLeft);
         PlayerManager.AddPlayer(player);
@@ -81,10 +81,9 @@ public class ArenaHub : Hub
         }
     }
     private void changeLocation(IMovement movement, Player player, List<BrickWall> bricks)
-
     {
-        double valueX = player.Left + movement.Dx;
-        double valueY = player.Top + movement.Dy;
+        int valueX = player.Left + movement.Dx;
+        int valueY = player.Top + movement.Dy;
         bool legalMove = true;
         foreach (var brick in bricks)
         {

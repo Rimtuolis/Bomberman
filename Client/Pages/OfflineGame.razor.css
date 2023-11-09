@@ -2,15 +2,16 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh; 
+    height: 100vh; /* Make the body take up the full viewport height */
     margin: 0;
 }
 
+/* CSS for the square arena */
 .arena {
-    width: 300px; 
+    width: 300px; /* Set the width and height to create a square */
     height: 300px;
-    border: 30px solid #000; 
-    position: relative; 
+    border: 30px solid #000; /* Add a black border */
+    position: relative; /* Position elements inside the arena */
 }
 
 /* Optional: Style for a player inside the arena */
