@@ -15,7 +15,7 @@ namespace BomberGopnik.Shared
 		public static Dictionary<String, Player> Players => players;
 
        
-        public static async Task  bombMonitor()
+        public static async Task bombMonitor()
         {
             while (true)
             {
