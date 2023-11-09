@@ -12,11 +12,12 @@
     <p class="player-counter">Players joined: @players.Count</p>
 </div>
 
-@if (arenaPaused)
+@if (subject.Paused)
 {
-    <div>
-        <p class="paused-player">@pausedPlayer.ConnectionId has paused the game</p>
-    </div>
+    @foreach (var player in pausePlayers)
+    {
+        <p class="paused-player">@player.ConnectionId has paused the game</p>
+    }
 }
 <div class="arena">
 
@@ -54,11 +55,12 @@
 }
 @if (playerJoined && IsConnected)
 {
-    @if (!arenaPaused)
+    
+    @if (!pausePlayers.Contains(this.getConnectedPlayer()))
     {
         <button class="pause-button" @onclick="PauseArena">Pause</button>
     }
-    else if (arenaPaused)
+    else
     {
         <button class="pause-button" @onclick="PauseArena">Unpause</button>
     }
@@ -90,7 +92,6 @@
     private HubConnection? hubConnection;
     private List<Player> players = new List<Player>();
     private List<Player> allPlayerScores = PlayerManager.Instance.GetAllPlayers();
-
     private List<BrickWall> bricks = new List<BrickWall>
     {
       new BrickWall(20,20,30),
@@ -105,10 +106,16 @@
 
     private List<Bomb> bombs = new List<Bomb>();
     private List<SpecialBomb> specialBombs = new List<SpecialBomb>();
+    private PlayerManagerSubject subject = new PlayerManagerSubject();
     bool playerJoined = false;
     bool arenaPaused = false;
     bool placedSpecialbomb = false;
-    private Player pausedPlayer, tempPlayer;
+    private Player pausedPlayer, tempPlayer, newPlayer, connectedPlayer;
+    private List<Player> pausedPlayers = new List<Player>();
+    private PlayerObserver? playerObserverer;
+    public List<IGameObserver> observerList = new List<IGameObserver>();
+    public List<PlayerObserver> pausedObservers = new List<PlayerObserver>();
+    public List<Player> pausePlayers = new List<Player>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -127,15 +134,24 @@
             StateHasChanged();
         });
 
-        hubConnection.On<Player>("PlayerJoined", (player) =>
+        hubConnection.On<Player, PlayerObserver>("PlayerJoined", (player, playerObserver) =>
         {
+            playerObserverer = playerObserver;
+            observerList.Add(playerObserverer);
             players.Add(player);
+            StateHasChanged();
+        });
+        hubConnection.On<Player>("ObserverJoined", (player) =>
+        {
+            playerObserverer = new PlayerObserver(player);
+            observerList.Add(playerObserverer);
+            pausedPlayer = player;
             StateHasChanged();
         });
 
         hubConnection.On<List<Player>>("PlayerMoved", (newPlayers) =>
         {
-            
+
             players = newPlayers;
             allPlayerScores = newPlayers;
             StateHasChanged();
@@ -147,10 +163,11 @@
             StateHasChanged();
         });
 
-        hubConnection.On<Player>("PauseArena", (player) =>
+        hubConnection.On<PlayerManagerSubject, Player, List<Player>>("PauseArena", (newSubject, player,observers) =>
         {
-            arenaPaused = !arenaPaused;
-            pausedPlayer = player;
+            subject = newSubject;
+            pausePlayers = observers;
+            newPlayer = player;
             StateHasChanged();
         });
 
@@ -182,14 +199,34 @@
     private async Task PauseArena()
     {
         var player = players.FirstOrDefault(p => p.ConnectionId == hubConnection.ConnectionId);
-        if (players.Count >= 2 && !arenaPaused)
+        tempPlayer = player;
+        if (players.Count >= 2 && !subject.Paused)
         {
-            tempPlayer = player;
-            await hubConnection.SendAsync("PauseArena", player);
+
+            subject.Subscribe(playerObserverer);
+            subject.NotifyAll(true);
+            pausePlayers.Add(tempPlayer);
+            await hubConnection.SendAsync("PauseArena", subject, tempPlayer, pausePlayers);
         }
-        else if (arenaPaused && player == tempPlayer)
+        else if (subject.Paused && !pausePlayers.Contains(tempPlayer))
         {
-            await hubConnection.SendAsync("PauseArena", player);
+            subject.Subscribe(playerObserverer);
+            subject.NotifyAll(true);
+            pausePlayers.Add(tempPlayer);
+            await hubConnection.SendAsync("PauseArena", subject, tempPlayer, pausePlayers);
+        }
+        else if (subject.Paused && pausePlayers.Contains(tempPlayer) && pausePlayers.Count > 1)
+        {
+            subject.Unsubscribe(playerObserverer);
+            pausePlayers.Remove(tempPlayer);
+            await hubConnection.SendAsync("PauseArena", subject, tempPlayer, pausePlayers);
+        }
+        else if (subject.Paused && pausePlayers.Contains(tempPlayer) && pausePlayers.Count <= 1)
+        {
+            subject.NotifyAll(false);
+            pausePlayers.Remove(tempPlayer);
+            subject.Unsubscribe(playerObserverer);
+            await hubConnection.SendAsync("PauseArena", subject, tempPlayer, pausePlayers);
         }
     }
 
@@ -206,7 +243,7 @@
     {
 
         Console.WriteLine(e.Code);
-        if (hubConnection is not null && playerJoined && players.Count >= 2 && !arenaPaused)
+        if (hubConnection is not null && playerJoined && players.Count >= 2 && !subject.Paused)
         {
             var player = players.FirstOrDefault(p => p.ConnectionId == hubConnection.ConnectionId);
             var bomb = new Bomb();
@@ -225,6 +262,11 @@
                 await hubConnection.SendAsync("RemoveSpecialBomb", player, specialBomb, e);
             }
         }
+    }
+    public Player getConnectedPlayer()
+    {
+        Player player = players.FirstOrDefault(p => p.ConnectionId == hubConnection.ConnectionId);
+        return player;
     }
 
     public bool IsConnected =>
