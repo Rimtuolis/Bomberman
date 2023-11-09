@@ -8,7 +8,7 @@ namespace BomberGopnik.Shared
 {
     internal class DefaultExplosion : IBombExplosionStrategy
     {
-        public int[,] Explode()
+        public List<int[]> Explode()
         {
             throw new NotImplementedException();
         }

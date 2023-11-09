@@ -9,10 +9,11 @@ namespace BomberGopnik.Shared
     public class UltraExplosionStrategy : IBombExplosionStrategy
     {
 
-        public int[,] Explode()
+        public List<int[]> Explode()
         {
-			int[,] temp = { { 0, 0, 1, 0, 0 }, { 0, 1, 1, 1, 0 }, { 1, 1, 1, 1, 1 }, { 0, 1, 1, 1, 0 }, { 0, 0, 1, 0, 0 } };
-            return temp;
+            List<int[]> temp = new List<int[]> { new int[] { 0, 0, 1, 0, 0 }, new int[] { 0, 1, 1, 1, 0 }, new int[] { 1, 1, 1, 1, 1 }, new int[] { 0, 1, 1, 1, 0 }, new int[] { 0, 0, 1, 0, 0 } };
+			
+			return temp;
 		}
     }
 }

@@ -17,7 +17,7 @@ namespace BomberGopnik.Shared
 			BombExplosionStrategy = strategy;
 		}
 
-		public int[,] executeStrategy() {
+		public List<int[]> executeStrategy() {
 			return BombExplosionStrategy.Explode();
 		}
 

@@ -8,6 +8,6 @@ namespace BomberGopnik.Shared
 {
     public interface IBombExplosionStrategy
     {
-        public int[,] Explode();
+        public List<int[]> Explode();
     }
 }

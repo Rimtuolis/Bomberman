@@ -16,7 +16,7 @@ namespace BomberGopnik.Shared
         public int Length { get; set; }
         public double StartY { get; set; }
         public double Power { get; set; }
-        public int[,] Path { get; set; }
+        public List<int[]> Path { get; set; }
         public Abstractbomb(IBombImplementor implementor,int timer, int radius, int startX, int length, int startY, string id, double power)
         {
             bombImplementor = implementor;
