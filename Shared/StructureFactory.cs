@@ -17,6 +17,8 @@ namespace BomberGopnik.Shared
                     return new BrickWall { StartX = startX, Length = length, StartY = startY };
                 //case "bomb":
                 //    return new Bomb { StartX = startX, Length = length, StartY = startY, Radius = radius, PlayerId = playerId, Timer = timer };
+                case "fire":
+                    return new Fire { StartX = startX, Length = length, StartY = startY };
                 default:
                     throw new ArgumentException("Invalid structure type");
             }
