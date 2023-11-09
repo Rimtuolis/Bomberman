@@ -23,6 +23,7 @@ public class ArenaHub : Hub
             return;
         }
 
+
         string[] colors = { "#ff0000", "#00ff00", "#0000ff", "#ff00ff", "#00ffff" };
         string playerColor = colors[random.Next(0, colors.Length)];
 
@@ -33,14 +34,16 @@ public class ArenaHub : Hub
         var player = new Player(Context.ConnectionId, playerColor, playerTop, playerLeft, points);
         
         PlayerManager.AddPlayer(player);
+        var playerObserver = new PlayerObserver(player);
 
         await Clients.Caller.SendAsync("AssignPlayer", PlayerManager.Players.Values.ToList());
-        await Clients.Others.SendAsync("PlayerJoined", player);
+        await Clients.Others.SendAsync("PlayerJoined", player, playerObserver);
+        await Clients.All.SendAsync("ObserverJoined", player);
     }
 
-    public async Task PauseArena(Player player)
+    public async Task PauseArena(PlayerManagerSubject subject, Player player, List<Player> pausedObservers)
     {
-        await Clients.All.SendAsync("PauseArena", player);
+        await Clients.All.SendAsync("PauseArena", subject, player, pausedObservers);
     }
 
     public async Task MovePlayer(Player player, List<BrickWall> bricks, KeyboardEventArgs e)
@@ -76,7 +79,6 @@ public class ArenaHub : Hub
                 bomb.placeBomb(player);
                 BombManager.Addbomb(bomb);
                 PlayerManager.Instance.IncrementScore(player, 5);
-                //PlayerManager.EditPlayer(player); // player.Points
                 Console.WriteLine(player.ConnectionId + " : " + PlayerManager.Instance.GetScore(player) +  " : " + player.Points);
                 await Clients.All.SendAsync("PlayerPlacedBomb", bomb);
                 await Clients.Others.SendAsync("AllBombs", BombManager.Bombs.Values.ToList());
