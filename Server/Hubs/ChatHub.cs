@@ -43,32 +43,30 @@ public class ArenaHub : Hub
     }
 
     public async Task MovePlayer(Player player, List<BrickWall> bricks, KeyboardEventArgs e)
-
     {
-        switch (e.Code)
-        {
-            case "37":
-                changeLocation(-5, 0, player, bricks);
-                break;
-            case "38":
-                changeLocation(0, -5, player, bricks);
-                break;
-            case "39":
-                changeLocation(5, 0, player, bricks);
-                break;
-            case "40":
-                changeLocation(0, 5, player, bricks);
-                break;
+		if (e != null) {
+			IMovement movement = CreateMovement(e);
+			changeLocation(movement, player, bricks);
 
-            default: break;
-        }
-        PlayerManager.EditPlayer(player);
+			PlayerManager.EditPlayer(player);
 
-        await Clients.All.SendAsync("PlayerMoved", PlayerManager.Players.Values.ToList());
+			await Clients.All.SendAsync("PlayerMoved", PlayerManager.Players.Values.ToList());
+		}
     }
 
+	private IMovement CreateMovement(KeyboardEventArgs e)
+	{
+		if (IsArrowKey(e.Code))
+		{
+			return new ArrowKeyMovement(e);
+		}
 
-    public async Task PlaceBomb(Player player, Bomb bomb, KeyboardEventArgs e)
+    	return new WASDKeyMovement(e);
+	}
+
+	bool IsArrowKey(String e) => e.Equals("37") || e.Equals("38") || e.Equals("39") || e.Equals("40");
+
+	public async Task PlaceBomb(Player player, Bomb bomb, KeyboardEventArgs e)
     {
         switch (e.Code)
         {
@@ -82,16 +80,15 @@ public class ArenaHub : Hub
             default: break;
         }
     }
-    private void changeLocation(int X, int Y, Player player, List<BrickWall> bricks)
+    private void changeLocation(IMovement movement, Player player, List<BrickWall> bricks)
 
     {
-        double valueX = player.Left + X;
-        double valueY = player.Top + Y;
+        double valueX = player.Left + movement.Dx;
+        double valueY = player.Top + movement.Dy;
         bool legalMove = true;
         foreach (var brick in bricks)
         {
-            /// Intervlas tarp startX <=  x  <= StartX + 6 and startY <=  Y  <= Starty    if sąlygą sukonstruoti
-			/// 
+
             if (valueX >= brick.GetStartX() && valueX <= brick.GetStartX() + 6 && valueY >= brick.GetStartY() && valueY <= brick.GetStartY() + 6 ||
                 valueX >= brick.GetStartX() - 6 && valueX <= brick.GetStartX() && valueY >= brick.GetStartY() - 6 && valueY <= brick.GetStartY())
             {
@@ -126,8 +123,7 @@ public class ArenaHub : Hub
     }
     private void placeBomb(Player player, Bomb bomb)
     {
-        Console.WriteLine(player.Left.ToString());
-        Console.WriteLine(player.Top.ToString());
+        ///TODO handle placing on square
         bomb.StartX = player.Left;
         bomb.StartY = player.Top;
     }

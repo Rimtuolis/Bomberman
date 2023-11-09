@@ -2,16 +2,15 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh; /* Make the body take up the full viewport height */
+    height: 100vh; 
     margin: 0;
 }
 
-/* CSS for the square arena */
 .arena {
-    width: 300px; /* Set the width and height to create a square */
+    width: 300px; 
     height: 300px;
-    border: 30px solid #000; /* Add a black border */
-    position: relative; /* Position elements inside the arena */
+    border: 30px solid #000; 
+    position: relative; 
 }
 
 /* Optional: Style for a player inside the arena */
@@ -24,6 +23,7 @@
     left: 50%; /* Center horizontally */
     transform: translate(-50%, -50%); /* Center the player element precisely */
 }
+
 .bomb {
     width: 10px;
     height: 10px;
@@ -49,6 +49,7 @@
     position: absolute;
     transform: translate(-50%, -50%);
 }
+
 .box {
     width: 30px;
     height: 30px;
@@ -56,6 +57,7 @@
     position: absolute;
     transform: translate(-50%, -50%);
 }
+
 .pause-button {
     margin-top: 20px; /* Add some space between arena and button */
     background-color: #007bff; /* Blue button color */
@@ -64,14 +66,17 @@
     padding: 10px 30px;
     cursor: pointer;
 }
+
 .player-counter {
     font-size: medium;
     color: blue;
 }
+
 .paused-player {
     font-size: large;
     color: red;
 }
+
 .container {
     border: 1px solid #ccc;
     padding: 20px;
