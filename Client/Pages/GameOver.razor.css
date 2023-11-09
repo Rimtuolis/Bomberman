@@ -1,0 +1,78 @@
+﻿body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Make the body take up the full viewport height */
+    margin: 0;
+}
+
+.message {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.winning {
+    color: green;
+    animation: fadeIn 1s;
+}
+
+.losing {
+    color: red;
+    animation: shake 0.5s;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes shake {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    10% {
+        transform: translate(10px, 0);
+    }
+
+    20% {
+        transform: translate(-10px, 0);
+    }
+
+    30% {
+        transform: translate(10px, 0);
+    }
+
+    40% {
+        transform: translate(-10px, 0);
+    }
+
+    50% {
+        transform: translate(10px, 0);
+    }
+
+    60% {
+        transform: translate(-10px, 0);
+    }
+
+    70% {
+        transform: translate(10px, 0);
+    }
+
+    80% {
+        transform: translate(-10px, 0);
+    }
+
+    90% {
+        transform: translate(10px, 0);
+    }
+
+    100% {
+        transform: translate(0, 0);
+    }
+}
