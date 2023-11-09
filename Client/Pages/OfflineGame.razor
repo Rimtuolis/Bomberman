@@ -1,0 +1,201 @@
+﻿@page "/OfflineGame"
+@using Microsoft.AspNetCore.SignalR.Client
+@using System.Timers
+@using BomberGopnik.Shared
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+
+<PageTitle>Game</PageTitle>
+
+@if (arenaPaused)
+{
+    <div>
+        <p class="paused-player">Player has paused the game</p>
+    </div>
+}
+
+@if (!GameStarted)
+{
+    <h2>Select Difficulty:</h2>
+    <form @onsubmit="StartGame">
+        <label for="difficulty">Difficulty:</label>
+        <select id="difficulty" @bind="SelectedDifficulty">
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+        </select>
+        <button type="submit">Start Game</button>
+    </form>
+}
+else
+{
+    <div class="arena">
+        <div class="player" style="top: @player.Top%; left: @player.Left%; background-color: @player.Color;"></div>
+        @foreach (var bot in bots)
+        {
+            <div class="player" style="top: @bot.Top%; left: @bot.Left%; background-color: @bot.Color;"></div>
+        }
+        @foreach (var brick in easyLevel.Bricks)
+        {
+            <div class="brick" style="top: @brick.GetStartX()%; left: @brick.GetStartY()%; width: @brick.GetLength()%px; height: @brick.GetLength()%px;"></div>
+        }
+        @foreach (var box in easyLevel.Boxes)
+        {
+            <div class="box" style="top: @box.GetStartX()%; left: @box.GetStartY()%; width: @box.GetLength()%px; height: @box.GetLength()%px;"></div>
+        }
+
+        @foreach (var bomb in bombs)
+        {
+            <div class="bomb" style="top: @bomb.StartY%; left: @bomb.StartX%;"></div>
+        }
+
+    </div>
+    @if (!arenaPaused)
+    {
+        <button class="pause-button" @onclick="PauseArena">Pause</button>
+    }
+    else if (arenaPaused)
+    {
+        <button class="pause-button" @onclick="PauseArena">Unpause</button>
+    }
+}
+
+
+
+
+
+@code {
+    private bool GameStarted = false;
+
+    private IGameLevelBuilder builder = new EasyGameLevelBuilder();
+    private GameLevel easyLevel = new GameLevel();
+    private string SelectedDifficulty = "easy";
+    private Player player;
+    private List<Bot> bots = new List<Bot>();
+    private List<Bomb> bombs = new List<Bomb>();
+    private int cnt = 0;
+
+    bool arenaPaused = false;
+    private Timer timer;
+
+    protected override async Task OnInitializedAsync()
+    {
+        timer = new Timer();
+        timer.Interval = 16;
+        timer.Elapsed += TimerElapsed;
+        timer.AutoReset = true;
+        timer.Enabled = true;
+        builder.BuildBoxes();
+        builder.BuildBricks();
+        easyLevel = builder.GetResult();
+        var lDotNetReference = DotNetObjectReference.Create(this);
+        await JS.InvokeVoidAsync("GLOBAL.SetDotnetReference", lDotNetReference);
+    }
+
+    private void StartGame()
+    {
+        GameStarted = true;
+        player = new Player("", "800000", 50, 50);
+        Bot hard = new HardBot();
+
+        hard.Top = 20;
+
+        bots.Add(hard);
+        bots.Add(hard.Clone());
+
+        Bot ez = new EasyBot();
+
+        ez.Top = 80;
+
+
+        bots.Add(ez);
+        bots.Add(ez.Clone());
+
+    }
+
+    private async Task PauseArena()
+    {
+        arenaPaused = !arenaPaused;
+    }
+
+    [JSInvokable("KeyDown")]
+    public async Task KeyDown(KeyboardEventArgs e)
+    {
+        if (GameStarted && !arenaPaused)
+        {
+            IMovement movement = CreateMovement(e);
+            handleMovement(movement);
+
+        }
+    }
+
+    private void handleMovement(IMovement movement) { 
+        int valueX = player.Left + movement.Dx;
+        int valueY = player.Top + movement.Dy;
+        bool legalMove = true;
+
+        foreach (var brick in easyLevel.Bricks)
+        {
+
+            if (valueX >= brick.GetStartX() && valueX <= brick.GetStartX() + 6 && valueY >= brick.GetStartY() && valueY <= brick.GetStartY() + 6 ||
+                valueX >= brick.GetStartX() - 6 && valueX <= brick.GetStartX() && valueY >= brick.GetStartY() - 6 && valueY <= brick.GetStartY())
+            {
+                legalMove = false;
+            }
+
+        }
+        switch (valueX)
+        {
+            case < 6:
+                player.Left = 6;
+                break;
+            case > 94:
+                player.Left = 94;
+                break;
+            default:
+                if (legalMove) player.Left = valueX;
+                break;
+        }
+        switch (valueY)
+        {
+            case < 6:
+                player.Top = 6;
+                break;
+            case > 94:
+                player.Top = 94;
+                break;
+            default:
+                if (legalMove) player.Top = valueY;
+                break;
+        }
+    }
+    private IMovement CreateMovement(KeyboardEventArgs e)
+    {
+        if (IsArrowKey(e.Code))
+        {
+            return new ArrowKeyMovement(e);
+        }
+
+        return new WASDKeyMovement(e);
+    }
+
+    bool IsArrowKey(String e) => e.Equals("37") || e.Equals("38") || e.Equals("39") || e.Equals("40");
+
+    private void TimerElapsed(Object source, System.Timers.ElapsedEventArgs e)
+    {
+        Update();
+        this.StateHasChanged();
+    }
+    private void Update()
+    {
+        if (cnt % 5 == 0 && !arenaPaused) { 
+            foreach (Bot temp in bots)
+            {
+                temp.PerformAction(easyLevel, player);
+            }
+        }
+
+        cnt++;
+    }
+}
+

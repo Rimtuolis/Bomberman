@@ -2,36 +2,19 @@
 
 namespace BomberGopnik.Shared
 {
-    public class Player
+	public class Player 
     {
-       // private IBombExplosion explosion;
-        public string? ConnectionId { get; set; }
-        public string? Color { get; set; }
-        public double Top { get; set; }
-        public double Left { get; set; }
-        public int Points { get; set; }
+		public string? ConnectionId { get; set; }
+		public string? Color { get; set; }
+		public int Top { get; set; }
+		public int Left { get; set; }
 
-        public Player(string connectionId, string color, double top, double left, int points)
-        {
-            this.ConnectionId = connectionId;
-            this.Color = color;
-            this.Top = top;
-            this.Left = left;
-            this.Points = points;
-        }
-
-       /* public Player(IBombExplosion exp)
-        {
-            explosion = exp;
-        }
-        public void SetStrategy(IBombExplosion bombExplosion)
-        {
-            explosion = bombExplosion;
-        }
-        public void Detonate(Bomb bomb)
-        {
-            explosion.Explode(bomb);
-        }*/
+		public Player(string connectionId, string color, int top, int left)
+		{
+			ConnectionId = connectionId;
+			Color = color;
+			Top = top;
+			Left = left;
+		}
     }
-
 }
