@@ -19,20 +19,21 @@
     </div>
 }
 <div class="arena">
-
+   
     @foreach (var player in players)
     {
         <div class="player" style="top: @player.Top%; left: @player.Left%; background-color: @player.Color;"></div>
     }
 
-    @foreach (var brick in bricks)
+    @foreach (var brick in easyLevel.Bricks)
     {
-        <div class="brick" style="top: @brick.StartX%; left: @brick.StartY%; width: @brick.Length%px; height: @brick.Length%px;"></div>
+        <div class="brick" style="top: @brick.GetStartX()%; left: @brick.GetStartY()%; width: @brick.GetLength()%px; height: @brick.GetLength()%px;"></div>
     }
-    @foreach (var box in boxes)
+    @foreach (var box in easyLevel.Boxes)
     {
-        <div class="box" style="top: @box.StartX%; left: @box.StartY%; width: @box.Length%px; height: @box.Length%px;"></div>
+        <div class="box" style="top: @box.GetStartX()%; left: @box.GetStartY()%; width: @box.GetLength()%px; height: @box.GetLength()%px;"></div>
     }
+
 
     @foreach (var bomb in bombs)
     {
@@ -44,9 +45,6 @@
     }
 
 </div>
-
-
-
 
 @if (!playerJoined)
 {
@@ -90,18 +88,9 @@
     private HubConnection? hubConnection;
     private List<Player> players = new List<Player>();
     private List<Player> allPlayerScores = PlayerManager.Instance.GetAllPlayers();
-
-    private List<BrickWall> bricks = new List<BrickWall>
-    {
-      new BrickWall(20,20,30),
-      new BrickWall(40,40,30),
-      new BrickWall(80,80,30)
-    };
-    private List<Box> boxes = new List<Box>
-    {
-      new Box(90,10,30),
-      new Box(60,90,30)
-    };
+    private IGameLevelBuilder builder = new EasyGameLevelBuilder();
+    private GameLevel easyLevel = new GameLevel();
+  
 
     private List<Bomb> bombs = new List<Bomb>();
     private List<SpecialBomb> specialBombs = new List<SpecialBomb>();
@@ -112,6 +101,9 @@
 
     protected override async Task OnInitializedAsync()
     {
+        builder.BuildBoxes();
+        builder.BuildBricks();
+        easyLevel = builder.GetResult();
         var lDotNetReference = DotNetObjectReference.Create(this);
         await JS.InvokeVoidAsync("GLOBAL.SetDotnetReference", lDotNetReference);
 
@@ -213,7 +205,7 @@
             var specialBomb = new SpecialBomb();
             bomb.Id = player.ConnectionId;
             specialBomb.Id = player.ConnectionId;
-            await hubConnection.SendAsync("MovePlayer", player, bricks, e);
+            await hubConnection.SendAsync("MovePlayer", player, easyLevel.Bricks, e);
             await hubConnection.SendAsync("PlaceBomb", player, bomb, e);
             if (!placedSpecialbomb)
             {

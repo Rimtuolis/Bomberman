@@ -7,9 +7,13 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
 
-public class ArenaHub : Hub
+public class ArenaHub : Hub, IArenaHub
 {
     private readonly Random random = new Random();
+    private readonly IHubContext<ArenaHub> _context;
+    public ArenaHub(IHubContext<ArenaHub> hubContext) {
+        _context = hubContext;
+    }
     public async Task JoinArena()
     {
         Player? existingPlayer = null;
@@ -33,7 +37,7 @@ public class ArenaHub : Hub
         var player = new Player(Context.ConnectionId, playerColor, playerTop, playerLeft, points);
         
         PlayerManager.AddPlayer(player);
-
+        Console.WriteLine(player.ConnectionId);
         await Clients.Caller.SendAsync("AssignPlayer", PlayerManager.Players.Values.ToList());
         await Clients.Others.SendAsync("PlayerJoined", player);
     }
@@ -74,19 +78,19 @@ public class ArenaHub : Hub
         {
             case "32":
                 bomb.placeBomb(player);
-                BombManager.Addbomb(bomb);
-              
+                await BombManager.Addbomb(bomb);
+
                 PlayerManager.Instance.IncrementScore(player, 5);
                 //PlayerManager.EditPlayer(player); // player.Points
                 Console.WriteLine(player.ConnectionId + " : " + PlayerManager.Instance.GetScore(player) +  " : " + player.Points);
                 await Clients.All.SendAsync("PlayerPlacedBomb", bomb);
-                await Clients.Others.SendAsync("AllBombs", BombManager.GetBombs());
                 await Clients.All.SendAsync("PlayerMoved", PlayerManager.Players.Values.ToList());
 
                 break;
 
             default: break;
         }
+        
     }
 
     public async Task RemoveSpecialBomb(Player player, SpecialBomb bomb, KeyboardEventArgs e)
@@ -167,5 +171,13 @@ public class ArenaHub : Hub
                 if (legalMove) player.Top = valueY;
                 break;
         }
+    }
+
+    public async Task SendBombsAll()
+    {
+       
+        Console.WriteLine(BombManager.GetBombs().Count);
+        await _context.Clients.All.SendAsync("AllBombs", BombManager.GetBombs());
+       
     }
 }

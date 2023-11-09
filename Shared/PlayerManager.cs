@@ -11,7 +11,7 @@ namespace BomberGopnik.Shared
 	{
 		private static readonly Dictionary<String, Player> players = new Dictionary<string, Player>();
 		private static readonly object locker = new object();
-
+      
 		public static Dictionary<String, Player> Players => players;
 
        

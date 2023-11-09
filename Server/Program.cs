@@ -15,8 +15,8 @@ builder.Services.AddResponseCompression(opts =>
 	opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
 	   new[] { "application/octet-stream" });
 });
-
-builder.Services.AddHostedService<BombMonitor>();
+builder.Services.AddSingleton<IArenaHub, ArenaHub>();
+builder.Services.AddHostedService<LiveMonitoring>();
 var app = builder.Build();
 app.UseResponseCompression();
 
