@@ -12,6 +12,24 @@
     height: 300px;
     border: 30px solid #000; /* Add a black border */
     position: relative; /* Position elements inside the arena */
+    display: grid;
+    grid-template-columns: repeat(7, 1fr); /* Three columns */
+    grid-template-rows: repeat(7, 1fr); /* Three rows */
+}
+/* Style the grid cells */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(10, 30px); /* Adjust as needed */
+    grid-template-rows: repeat(10, 30px); /* Adjust as needed */
+    border: 10px solid black; /* Add border for visualization */
+    width: fit-content; /* Adjust width as per grid size */ /* Add some padding */
+    position: relative; /* Position for absolute positioning of players */
+}
+
+.grid-item {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #000;
 }
 
 .scoreboard {
@@ -21,6 +39,7 @@
     padding: 20px;
     width: 300px;
     height: 300px;
+    position: absolute;
 }
 
 
@@ -30,18 +49,19 @@
     height: 30px;
     background-color: #ff0000; /* Red player */
     position: absolute;
-    transition: top 0.5s, left 0.5s;
-    top: 50%; /* Center vertically */
-    left: 50%; /* Center horizontally */
-    transform: translate(-50%, -50%); /* Center the player element precisely */
+    transition: top 0.1s, left 0.1s;
+    
+
 }
+
 .bomb {
     width: 10px;
     height: 10px;
     background-color: #ff0000;
     border: dotted;
+    top: 50%; /* Center vertically */
+    left: 50%;
     position: absolute;
-    transform: translate(-50%, -50%);
 }
 
 .specialBomb {
@@ -50,7 +70,7 @@
     background-color: green;
     border: dotted;
     position: absolute;
-    transform: translate(-50%, -50%);
+    
 }
 
 .join-button {
@@ -67,14 +87,14 @@
     height: 30px;
     background-color: #AA4A44;
     position: absolute;
-    transform: translate(-50%, -50%);
+    
 }
 .box {
     width: 30px;
     height: 30px;
     background-color: #966F33;
     position: absolute;
-    transform: translate(-50%, -50%);
+    
 }
 .pause-button {
     margin-top: 20px; /* Add some space between arena and button */

@@ -50,6 +50,7 @@ public class ArenaHub : Hub, IArenaHub
     public async Task MovePlayer(Player player, List<BrickWall> bricks, KeyboardEventArgs e)
     {
 		if (e != null) {
+            Console.WriteLine(player.Left + " - " + player.Top) ;
 			IMovement movement = CreateMovement(e);
 			changeLocation(movement, player, bricks);
 
@@ -76,9 +77,10 @@ public class ArenaHub : Hub, IArenaHub
         switch (e.Code)
         {
             case "32":
+
                 bomb.placeBomb(player);
                 await BombManager.Addbomb(bomb);
-
+                Console.WriteLine(bomb.StartX + " - " + bomb.StartY);
                 PlayerManager.Instance.IncrementScore(player, 5);
                 //PlayerManager.EditPlayer(player); // player.Points
                 Console.WriteLine(player.ConnectionId + " : " + PlayerManager.Instance.GetScore(player) +  " : " + player.Points);
@@ -138,20 +140,20 @@ public class ArenaHub : Hub, IArenaHub
         foreach (var brick in bricks)
         {
 
-            if (valueX >= brick.GetStartX() && valueX <= brick.GetStartX() + 6 && valueY >= brick.GetStartY() && valueY <= brick.GetStartY() + 6 ||
-                valueX >= brick.GetStartX() - 6 && valueX <= brick.GetStartX() && valueY >= brick.GetStartY() - 6 && valueY <= brick.GetStartY())
+        /*    if (valueX >= brick.GetStartX() && valueX <= brick.GetStartX() + 10 && valueY >= brick.GetStartY() && valueY <= brick.GetStartY() + 10 ||
+                valueX >= brick.GetStartX() - 10 && valueX <= brick.GetStartX() && valueY >= brick.GetStartY() - 10 && valueY <= brick.GetStartY())
             {
                 legalMove = false;
-            }
+            }*/
 
         }
         switch (valueX)
         {
-            case < 6:
-                player.Left = 6;
+            case < 0:
+                player.Left = 0;
                 break;
-            case > 94:
-                player.Left = 94;
+            case > 90:
+                player.Left = 90;
                 break;
             default:
                 if (legalMove) player.Left = valueX;
@@ -159,11 +161,11 @@ public class ArenaHub : Hub, IArenaHub
         }
         switch (valueY)
         {
-            case < 6:
-                player.Top = 6;
+            case < 0:
+                player.Top = 0;
                 break;
-            case > 94:
-                player.Top = 94;
+            case > 90:
+                player.Top = 90;
                 break;
             default:
                 if (legalMove) player.Top = valueY;
