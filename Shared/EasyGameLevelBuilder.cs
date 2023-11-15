@@ -19,7 +19,6 @@ namespace BomberGopnik.Shared
             boxFactory.CreateStructure(30, 30, 30, 0),
             boxFactory.CreateStructure(20, 40, 30, 0),
             boxFactory.CreateStructure(70, 50, 30, 0),
-            boxFactory.CreateStructure(50, 50, 30, 0)
             };
         }
 
