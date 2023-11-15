@@ -1,6 +1,8 @@
 ﻿@page "/Game"
 @using Microsoft.AspNetCore.SignalR.Client
 @using BomberGopnik.Shared
+@using System.Text.Json;
+@using Newtonsoft.Json;
 @inject NavigationManager Navigation
 @implements IAsyncDisposable
 @inject IJSRuntime JS
@@ -92,7 +94,14 @@
     private List<Player> allPlayerScores = PlayerManager.Instance.GetAllPlayers();
     private IGameLevelBuilder builder = new EasyGameLevelBuilder();
     private GameLevel easyLevel = new GameLevel();
-
+    JsonSerializerSettings settings = new JsonSerializerSettings()
+        {
+            Converters = new List<JsonConverter>
+            {
+                new InterfaceToConcreteTypeJsonConverter<IStructure,BrickWall>(),
+                new InterfaceToConcreteTypeJsonConverter<IStructure,Box>()
+            }
+        };
 
 
     private List<Bomb> bombs = new List<Bomb>();
@@ -244,7 +253,10 @@
             var specialBomb = new SpecialBomb();
             bomb.Id = player.ConnectionId;
             specialBomb.Id = player.ConnectionId;
-            await hubConnection.SendAsync("MovePlayer", player, easyLevel.Bricks, e);
+            string tempBricks = JsonConvert.SerializeObject(easyLevel.Bricks, settings);
+            string tempBoxes = JsonConvert.SerializeObject(easyLevel.Boxes, settings);
+
+            await hubConnection.SendAsync("MovePlayer", player, tempBricks, e);
             await hubConnection.SendAsync("PlaceBomb", player, bomb, e);
             if (!placedSpecialbomb)
             {

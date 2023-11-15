@@ -6,6 +6,8 @@ namespace BomberGopnik.Server.Hubs;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
+using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 public class ArenaHub : Hub, IArenaHub
 {
@@ -50,7 +52,7 @@ public class ArenaHub : Hub, IArenaHub
         await Clients.All.SendAsync("PauseArena", subject, player, pausedObservers);
     }
 
-    public async Task MovePlayer(Player player, List<BrickWall> bricks, KeyboardEventArgs e)
+    public async Task MovePlayer(Player player, string bricks, KeyboardEventArgs e)
     {
 		if (e != null) {
 			IMovement movement = CreateMovement(e);
@@ -132,11 +134,12 @@ public class ArenaHub : Hub, IArenaHub
             default: break;
         }
     }
-    private void changeLocation(IMovement movement, Player player, List<BrickWall> bricks)
+    private void changeLocation(IMovement movement, Player player, string jsonBricks)
     {
         int valueX = player.Left + movement.Dx;
         int valueY = player.Top + movement.Dy;
         bool legalMove = true;
+        List<BrickWall> bricks = JsonConvert.DeserializeObject<List<BrickWall>>(jsonBricks);
         foreach (var brick in bricks)
         {
 
