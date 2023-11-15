@@ -20,24 +20,23 @@
     {
         <p class="paused-player">@player.ConnectionId has paused the game</p>
     }
+
 }
-<div class="arena">
+
+<div class="grid-container">
+    @for (int row = 0; row < 10; row++)
+    {
+        @for (int col = 0; col < 10; col++)
+        {
+            <div class="grid-item"></div>
+        }
+    }
    
+  
     @foreach (var player in players)
     {
         <div class="player" style="top: @player.Top%; left: @player.Left%; background-color: @player.Color;"></div>
     }
-
-    @foreach (var brick in easyLevel.Bricks)
-    {
-        <div class="brick" style="top: @brick.GetStartX()%; left: @brick.GetStartY()%; width: @brick.GetLength()%px; height: @brick.GetLength()%px;"></div>
-    }
-    @foreach (var box in easyLevel.Boxes)
-    {
-        <div class="box" style="top: @box.GetStartX()%; left: @box.GetStartY()%; width: @box.GetLength()%px; height: @box.GetLength()%px;"></div>
-    }
-
-
     @foreach (var bomb in bombs)
     {
         <div class="bomb" style="top: @bomb.StartY%; left: @bomb.StartX%;"></div>
@@ -46,8 +45,17 @@
     {
         <div class="specialBomb" style="top: @bomb.StartY%; left: @bomb.StartX%;"></div>
     }
-
+    @foreach (var brick in easyLevel.Bricks)
+    {
+        <div class="brick" style="top: @brick.GetStartX()%; left: @brick.GetStartY()%; width: @brick.GetLength()%px; height: @brick.GetLength()%px;"></div>
+    }
+    @foreach (var box in easyLevel.Boxes)
+    {
+        <div class="box" style="top: @box.GetStartX()%; left: @box.GetStartY()%; width: @box.GetLength()%px; height: @box.GetLength()%px;"></div>
+    }
 </div>
+
+
 
 @if (!playerJoined)
 {
@@ -66,25 +74,25 @@
     }
 }
 <div class="scoreboard">
-<table id="scoreboard">
-    <thead>
-        <tr>
-            <th>Scoreboard</th>
-        </tr>
-    </thead>
-    <tbody>
-       
-        @foreach (var player in allPlayerScores)
-        {
+    <table id="scoreboard">
+        <thead>
             <tr>
-                <td>@player.ConnectionId : </td>
-                <th>@player.Points</th>
+                <th>Scoreboard</th>
             </tr>
-        }
-       
-    </tbody>
+        </thead>
+        <tbody>
 
-</table>
+            @foreach (var player in allPlayerScores)
+            {
+                <tr>
+                    <td>@player.ConnectionId : </td>
+                    <th>@player.Points</th>
+                </tr>
+            }
+
+        </tbody>
+
+    </table>
 </div>
 
 
@@ -154,14 +162,12 @@
 
         hubConnection.On<List<Player>>("PlayerMoved", (newPlayers) =>
         {
-
             players = newPlayers;
             allPlayerScores = newPlayers;
             StateHasChanged();
         });
         hubConnection.On<List<Bomb>>("AllBombs", (newBombs) =>
         {
-
             bombs = newBombs;
             StateHasChanged();
         });
