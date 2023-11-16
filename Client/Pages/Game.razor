@@ -14,56 +14,87 @@
 <div>
     <p class="player-counter">Players joined: @players.Count</p>
 </div>
+<div>
+
 @if (subject.Paused)
 {
     @foreach (var player in pausePlayers)
     {
-        <p class="paused-player">@player.ConnectionId has paused the game</p>
-    }
-
-}
-
-<div class="grid-container">
-    @for (int row = 0; row < 10; row++)
-    {
-        @for (int col = 0; col < 10; col++)
-        {
-            <div class="grid-item"></div>
+            <p class="paused-player">@player.ConnectionId has paused the game</p>
         }
+
     }
- 
-  
-    @foreach (var player in players)
+    else
     {
-        <div class="player" style="top: @player.Top%; left: @player.Left%; background-color: @player.Color;"></div>
-    }
-    @foreach (var bomb in bombs)
-    {
-        <div class="bomb" style="top: @bomb.StartY%; left: @bomb.StartX%;"></div>
-    }
-    @foreach (var bomb in specialBombs)
-    {
-        <div class="specialBomb" style="top: @bomb.StartY%; left: @bomb.StartX%;"></div>
-    }
-    @foreach (var brick in easyLevel.Bricks)
-    {
-        <div class="brick" style="left: @brick.GetStartX()%; top: @brick.GetStartY()%; width: @brick.GetLength()%px; height: @brick.GetLength()%px;"></div>
-    }
-    @foreach (var box in easyLevel.Boxes)
-    {
-        <div class="box" style="left: @box.GetStartX()%; top: @box.GetStartY()%; width: @box.GetLength()%px; height: @box.GetLength()%px;"></div>
+        <p style= "color: transparent; font-size: large" > Nematoma</p>
     }
 </div>
+<div class="game-container">
+    <div class="grid-container">
+
+        @for (int row = 0; row < 10; row++)
+        {
+            @for (int col = 0; col < 10; col++)
+            {
+                <div class="grid-item"></div>
+            }
+        }
 
 
+        @foreach (var player in players)
+        {
+            <div class="player" style="top: @player.Top%; left: @player.Left%; background-color: @player.Color;"></div>
+        }
+        @foreach (var bomb in bombs)
+        {
+            <div class="bomb" style="top: @bomb.StartY%; left: @bomb.StartX%;"></div>
+        }
+        @foreach (var bomb in specialBombs)
+        {
+            <div class="specialBomb" style="top: @bomb.StartY%; left: @bomb.StartX%;"></div>
+        }
+        @foreach (var brick in easyLevel.Bricks)
+        {
+            <div class="brick" style="left: @brick.GetStartX()%; top: @brick.GetStartY()%; width: @brick.GetLength()%px; height: @brick.GetLength()%px;"></div>
+        }
+        @foreach (var box in easyLevel.Boxes)
+        {
+            <div class="box" style="left: @box.GetStartX()%; top: @box.GetStartY()%; width: @box.GetLength()%px; height: @box.GetLength()%px;"></div>
+        }
 
+    </div>
+
+    <div class="scoreboard">
+        <table id="scoreboard">
+            <thead>
+                <tr>
+                    <th>Scoreboard</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (var player in allPlayerScores)
+                {
+
+                    <tr>
+                        <td>Player: @x</td>
+                        <th>@player.Points</th>
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
 @if (!playerJoined)
 {
     <button class="join-button" @onclick="JoinArena" disabled="@(!IsConnected && playerJoined)">Join Arena</button>
 }
 @if (playerJoined && IsConnected)
 {
-    
+
     @if (!pausePlayers.Contains(this.getConnectedPlayer()))
     {
         <button class="pause-button" @onclick="PauseArena">Pause</button>
@@ -73,28 +104,7 @@
         <button class="pause-button" @onclick="PauseArena">Unpause</button>
     }
 }
-<div class="scoreboard">
-    <table id="scoreboard">
-        <thead>
-            <tr>
-                <th>Scoreboard</th>
-            </tr>
-        </thead>
-        <tbody>
-            
-            @foreach (var player in allPlayerScores)
-            {
-                
-                <tr>
-                    <td>Player: @x</td>
-                    <th>@player.Points</th>
-                </tr>
-            }
-        </tbody>
 
-    </table>
-
-</div>
 
 
 @code {
@@ -174,7 +184,7 @@
             StateHasChanged();
         });
 
-        hubConnection.On<PlayerManagerSubject, Player, List<Player>>("PauseArena", (newSubject, player,observers) =>
+        hubConnection.On<PlayerManagerSubject, Player, List<Player>>("PauseArena", (newSubject, player, observers) =>
         {
             subject = newSubject;
             pausePlayers = observers;
@@ -292,6 +302,6 @@
             await hubConnection.DisposeAsync();
         }
     }
-   
+
 }
 

@@ -44,6 +44,6 @@ GLOBAL.SetDotnetReference = function (pDotNetReference) {
                 GLOBAL.DotNetReference.invokeMethodAsync('KeyDown', serializeEvent(keyState[key].event, true));
             }
         }
-    }, 20); // keist skaiciu pagal update
+    }, 80); // keist skaiciu pagal update
 
 })();
