@@ -180,8 +180,6 @@ public class ArenaHub : Hub, IArenaHub
 
     public async Task SendBombsAll()
     {
-       
-        //Console.WriteLine(BombManager.GetBombs().Count);
         await _context.Clients.All.SendAsync("AllBombs", BombManager.GetBombs());
        
     }
