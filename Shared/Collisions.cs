@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace BomberGopnik.Shared
 {
-	internal class Collisions
+	public class Collisions
 	{
+		public bool validMove(Player player, GameLevel game) {
+
+			return true;
+		}
 	}
 }
