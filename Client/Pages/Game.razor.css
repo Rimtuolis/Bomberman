@@ -56,7 +56,9 @@
     height: 30px;
     background: url(YellowPlayer.png); /* Red player */
     position: absolute;
-    transition: top 0.1s, left 0.1s;
+    /*transition: top 0.1s, left 0.1s;*/
+    
+
 }
 
 .bomb {
@@ -67,6 +69,14 @@
     left: 50%;
     position: absolute;
 }
+
+.explosion {
+    width: 30px;
+    height: 30px;
+    background-color: #ff0000;
+    position: absolute;
+}
+
 
 .specialBomb {
     width: 15px;

@@ -63,8 +63,7 @@
         }
 
     </div>
-
-    <div class="scoreboard">
+<div class="scoreboard">
         <table id="scoreboard">
             <thead>
                 <tr>
@@ -131,7 +130,6 @@
     bool arenaPaused = false;
     bool placedSpecialbomb = false;
     private Player pausedPlayer, tempPlayer, newPlayer, connectedPlayer;
-    private List<Player> pausedPlayers = new List<Player>();
     private PlayerObserver? playerObserverer;
     public List<IGameObserver> observerList = new List<IGameObserver>();
     public List<PlayerObserver> pausedObservers = new List<PlayerObserver>();
@@ -250,7 +248,6 @@
             await hubConnection.SendAsync("PauseArena", subject, tempPlayer, pausePlayers);
         }
     }
-
     private async Task JoinArena()
     {
         if (hubConnection is not null && !playerJoined)
@@ -291,10 +288,8 @@
         Player player = players.FirstOrDefault(p => p.ConnectionId == hubConnection.ConnectionId);
         return player;
     }
-
     public bool IsConnected =>
         hubConnection?.State == HubConnectionState.Connected;
-
     public async ValueTask DisposeAsync()
     {
         if (hubConnection is not null)
