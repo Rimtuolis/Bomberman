@@ -3,6 +3,8 @@
 @using BomberGopnik.Shared
 @using System.Text.Json;
 @using Newtonsoft.Json;
+@using System.Net;
+@using System.Net.Sockets;
 @inject NavigationManager Navigation
 @implements IAsyncDisposable
 @inject IJSRuntime JS
@@ -13,7 +15,6 @@
 <div>
     <p class="player-counter">Players joined: @players.Count</p>
 </div>
-
 @if (subject.Paused)
 {
     @foreach (var player in pausePlayers)
@@ -261,7 +262,6 @@
             specialBomb.Id = player.ConnectionId;
             string tempBricks = JsonConvert.SerializeObject(easyLevel.Bricks, settings);
             string tempBoxes = JsonConvert.SerializeObject(easyLevel.Boxes, settings);
-
             await hubConnection.SendAsync("MovePlayer", player, tempBricks, e);
             await hubConnection.SendAsync("PlaceBomb", player, bomb, e);
             if (!placedSpecialbomb)
@@ -291,5 +291,6 @@
             await hubConnection.DisposeAsync();
         }
     }
+   
 }
 

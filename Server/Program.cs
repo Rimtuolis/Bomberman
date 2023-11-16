@@ -9,6 +9,17 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        builder =>
+        {
+            builder.AllowAnyOrigin()
+                   .AllowAnyMethod()
+                   .AllowAnyHeader();
+        });
+});
+
 builder.Services.AddSignalR();
 builder.Services.AddResponseCompression(opts =>
 {
@@ -17,6 +28,7 @@ builder.Services.AddResponseCompression(opts =>
 });
 builder.Services.AddSingleton<IArenaHub, ArenaHub>();
 builder.Services.AddHostedService<LiveMonitoring>();
+
 var app = builder.Build();
 app.UseResponseCompression();
 
@@ -39,7 +51,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-
+app.UseCors("AllowAll");
 app.MapRazorPages();
 app.MapControllers();
 app.MapHub<ArenaHub>("/arenahub");
