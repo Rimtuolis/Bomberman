@@ -13,7 +13,8 @@ public class ArenaHub : Hub, IArenaHub
 {
     private readonly Random random = new Random();
     private readonly IHubContext<ArenaHub> _context;
-    public ArenaHub(IHubContext<ArenaHub> hubContext) {
+    public ArenaHub(IHubContext<ArenaHub> hubContext)
+    {
         _context = hubContext;
     }
     public async Task JoinArena()
@@ -30,15 +31,15 @@ public class ArenaHub : Hub, IArenaHub
         }
 
 
-        string[] colors = { "#ff0000", "#00ff00", "#0000ff", "#ff00ff", "#00ffff" };
-        string playerColor = colors[random.Next(0, colors.Length)];
+        string[] colors = { "#ffffff00", "#ff0000", "#00ff00", "#0000ff", "#ff00ff", "#00ffff" };
+        string playerColor = colors[0];
 
         int playerTop = 50;
-		int playerLeft = 50;
+        int playerLeft = 50;
         int points = 0;
 
         var player = new Player(Context.ConnectionId, playerColor, playerTop, playerLeft, points);
-        
+
         PlayerManager.AddPlayer(player);
         var playerObserver = new PlayerObserver(player);
 
@@ -52,32 +53,33 @@ public class ArenaHub : Hub, IArenaHub
         await Clients.All.SendAsync("PauseArena", subject, player, pausedObservers);
     }
 
-    public async Task MovePlayer(Player player, string bricks, KeyboardEventArgs e)
+    public async Task MovePlayer(Player player, string bricks,string box,  KeyboardEventArgs e)
     {
-		if (e != null) {
-            Console.WriteLine(player.Left + " - " + player.Top) ;
-			IMovement movement = CreateMovement(e);
-			changeLocation(movement, player, bricks);
+        if (e != null)
+        {
+            Console.WriteLine(player.Left + " - " + player.Top);
+            IMovement movement = CreateMovement(e);
+            changeLocation(movement, player, bricks, box);
 
-			PlayerManager.EditPlayer(player);
+            PlayerManager.EditPlayer(player);
 
-			await Clients.All.SendAsync("PlayerMoved", PlayerManager.Players.Values.ToList());
-		}
+            await Clients.All.SendAsync("PlayerMoved", PlayerManager.Players.Values.ToList());
+        }
     }
 
-	private IMovement CreateMovement(KeyboardEventArgs e)
-	{
-		if (IsArrowKey(e.Code))
-		{
-			return new ArrowKeyMovement(e);
-		}
+    private IMovement CreateMovement(KeyboardEventArgs e)
+    {
+        if (IsArrowKey(e.Code))
+        {
+            return new ArrowKeyMovement(e);
+        }
 
-    	return new WASDKeyMovement(e);
-	}
+        return new WASDKeyMovement(e);
+    }
 
-	bool IsArrowKey(String e) => e.Equals("37") || e.Equals("38") || e.Equals("39") || e.Equals("40");
+    bool IsArrowKey(String e) => e.Equals("37") || e.Equals("38") || e.Equals("39") || e.Equals("40");
 
-	public async Task PlaceBomb(Player player, Bomb bomb, KeyboardEventArgs e)
+    public async Task PlaceBomb(Player player, Bomb bomb, KeyboardEventArgs e)
     {
         switch (e.Code)
         {
@@ -87,7 +89,7 @@ public class ArenaHub : Hub, IArenaHub
                 await BombManager.Addbomb(bomb);
                 Console.WriteLine(bomb.StartX + " - " + bomb.StartY);
                 PlayerManager.Instance.IncrementScore(player, 5);
-                Console.WriteLine(player.ConnectionId + " : " + PlayerManager.Instance.GetScore(player) +  " : " + player.Points);
+                Console.WriteLine(player.ConnectionId + " : " + PlayerManager.Instance.GetScore(player) + " : " + player.Points);
                 await Clients.All.SendAsync("PlayerPlacedBomb", bomb);
                 await Clients.All.SendAsync("PlayerMoved", PlayerManager.Players.Values.ToList());
 
@@ -95,7 +97,7 @@ public class ArenaHub : Hub, IArenaHub
 
             default: break;
         }
-        
+
     }
 
     public async Task RemoveSpecialBomb(Player player, SpecialBomb bomb, KeyboardEventArgs e)
@@ -136,21 +138,35 @@ public class ArenaHub : Hub, IArenaHub
             default: break;
         }
     }
-    private void changeLocation(IMovement movement, Player player, string jsonBricks)
+    private void changeLocation(IMovement movement, Player player, string jsonBricks, string jsonboxes)
     {
         int valueX = player.Left + movement.Dx;
         int valueY = player.Top + movement.Dy;
+        int BrickBottomX;
+        int BrickBottomY;
+
         bool legalMove = true;
+        Console.WriteLine("start " + player.Left + " - " + player.Top);
+        Console.WriteLine("then " + valueX + " - " + valueY);
+
         List<BrickWall> bricks = JsonConvert.DeserializeObject<List<BrickWall>>(jsonBricks);
+        List<Box> boxes = JsonConvert.DeserializeObject<List<Box>>(jsonboxes);
+        Console.WriteLine("brick " + bricks[0].GetStartX() + " - " + bricks[0].GetStartY());
         foreach (var brick in bricks)
         {
+           
+            if (brick.GetStartX() < valueX + 10 && brick.GetStartX() + 10 > valueX && brick.GetStartY() < valueY + 10 && brick.GetStartY() + 10 > valueY)
+            {
+                legalMove = false;  
+            }
+        }
+        foreach (var box in boxes)
+        {
 
-        /*    if (valueX >= brick.GetStartX() && valueX <= brick.GetStartX() + 10 && valueY >= brick.GetStartY() && valueY <= brick.GetStartY() + 10 ||
-                valueX >= brick.GetStartX() - 10 && valueX <= brick.GetStartX() && valueY >= brick.GetStartY() - 10 && valueY <= brick.GetStartY())
+            if (box.GetStartX() < valueX + 10 && box.GetStartX() + 10 > valueX && box.GetStartY() < valueY + 10 && box.GetStartY() + 10 > valueY)
             {
                 legalMove = false;
-            }*/
-
+            }
         }
         switch (valueX)
         {
@@ -181,6 +197,6 @@ public class ArenaHub : Hub, IArenaHub
     public async Task SendBombsAll()
     {
         await _context.Clients.All.SendAsync("AllBombs", BombManager.GetBombs());
-       
+
     }
 }

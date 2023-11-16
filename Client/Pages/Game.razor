@@ -3,17 +3,17 @@
 @using BomberGopnik.Shared
 @using System.Text.Json;
 @using Newtonsoft.Json;
+@using System.Net;
+@using System.Net.Sockets;
 @inject NavigationManager Navigation
 @implements IAsyncDisposable
 @inject IJSRuntime JS
 
 <PageTitle>Game</PageTitle>
 
-
 <div>
     <p class="player-counter">Players joined: @players.Count</p>
 </div>
-
 @if (subject.Paused)
 {
     @foreach (var player in pausePlayers)
@@ -31,7 +31,7 @@
             <div class="grid-item"></div>
         }
     }
-   
+ 
   
     @foreach (var player in players)
     {
@@ -64,11 +64,11 @@
     }
     @foreach (var brick in easyLevel.Bricks)
     {
-        <div class="brick" style="top: @brick.GetStartX()%; left: @brick.GetStartY()%; width: @brick.GetLength()%px; height: @brick.GetLength()%px;"></div>
+        <div class="brick" style="left: @brick.GetStartX()%; top: @brick.GetStartY()%; width: @brick.GetLength()%px; height: @brick.GetLength()%px;"></div>
     }
     @foreach (var box in easyLevel.Boxes)
     {
-        <div class="box" style="top: @box.GetStartX()%; left: @box.GetStartY()%; width: @box.GetLength()%px; height: @box.GetLength()%px;"></div>
+        <div class="box" style="left: @box.GetStartX()%; top: @box.GetStartY()%; width: @box.GetLength()%px; height: @box.GetLength()%px;"></div>
     }
 </div>
 
@@ -98,22 +98,24 @@
             </tr>
         </thead>
         <tbody>
-
+            
             @foreach (var player in allPlayerScores)
             {
+                
                 <tr>
-                    <td>@player.ConnectionId : </td>
+                    <td>Player: @x</td>
                     <th>@player.Points</th>
                 </tr>
             }
-
         </tbody>
 
     </table>
+
 </div>
 
 
 @code {
+    private int x = 1;
     private HubConnection? hubConnection;
     private List<Player> players = new List<Player>();
     private List<Player> allPlayerScores = PlayerManager.Instance.GetAllPlayers();
@@ -265,7 +267,6 @@
     [JSInvokable("KeyDown")]
     public async Task KeyDown(KeyboardEventArgs e)
     {
-
         Console.WriteLine(e.Code);
         if (hubConnection is not null && playerJoined && players.Count >= 2 && !subject.Paused)
         {
@@ -277,7 +278,7 @@
             string tempBricks = JsonConvert.SerializeObject(easyLevel.Bricks, settings);
             string tempBoxes = JsonConvert.SerializeObject(easyLevel.Boxes, settings);
 
-            await hubConnection.SendAsync("MovePlayer", player, tempBricks, e);
+            await hubConnection.SendAsync("MovePlayer", player, tempBricks, tempBoxes, e);
             await hubConnection.SendAsync("PlaceBomb", player, bomb, e);
             if (!placedSpecialbomb)
             {
@@ -304,5 +305,6 @@
             await hubConnection.DisposeAsync();
         }
     }
+   
 }
 
