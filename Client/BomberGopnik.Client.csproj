@@ -24,4 +24,8 @@
     <ProjectReference Include="..\Shared\BomberGopnik.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Assets\" />
+  </ItemGroup>
+
 </Project>

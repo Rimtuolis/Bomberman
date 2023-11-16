@@ -31,8 +31,8 @@ public class ArenaHub : Hub, IArenaHub
         }
 
 
-        string[] colors = { "#ff0000", "#00ff00", "#0000ff", "#ff00ff", "#00ffff" };
-        string playerColor = colors[random.Next(0, colors.Length)];
+        string[] colors = { "#ffffff00", "#ff0000", "#00ff00", "#0000ff", "#ff00ff", "#00ffff" };
+        string playerColor = colors[0];
 
         
         int playerTop = 50;
@@ -197,8 +197,6 @@ public class ArenaHub : Hub, IArenaHub
 
     public async Task SendBombsAll()
     {
-
-        //Console.WriteLine(BombManager.GetBombs().Count);
         await _context.Clients.All.SendAsync("AllBombs", BombManager.GetBombs());
 
     }

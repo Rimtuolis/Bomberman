@@ -27,29 +27,39 @@
         <button type="submit">Start Game</button>
     </form>
 }
+
 else
-{
-    <div class="arena">
-        <div class="player" style="top: @player.Top%; left: @player.Left%; background-color: @player.Color;"></div>
-        @foreach (var bot in bots)
+{<div class="grid-container">
+    @for (int row = 0; row < 10; row++)
+    {
+        @for (int col = 0; col < 10; col++)
         {
-            <div class="player" style="top: @bot.Top%; left: @bot.Left%; background-color: @bot.Color;"></div>
+            <div class="grid-item"></div>
         }
-        @foreach (var brick in easyLevel.Bricks)
-        {
-            <div class="brick" style="top: @brick.GetStartX()%; left: @brick.GetStartY()%; width: @brick.GetLength()%px; height: @brick.GetLength()%px;"></div>
-        }
-        @foreach (var box in easyLevel.Boxes)
-        {
-            <div class="box" style="top: @box.GetStartX()%; left: @box.GetStartY()%; width: @box.GetLength()%px; height: @box.GetLength()%px;"></div>
-        }
+    }
 
-        @foreach (var bomb in bombs)
-        {
-            <div class="bomb" style="top: @bomb.StartY%; left: @bomb.StartX%;"></div>
-        }
-
-    </div>
+    <div class="player" style="top: @player.Top%; left: @player.Left%; background-color: @player.Color;"></div>
+    @foreach (var bot in bots)
+    {
+        <div class="player" style="top: @bot.Top%; left: @bot.Left%; background-color: @bot.Color;"></div>
+    }
+    @foreach (var bomb in bombs)
+    {
+        <div class="bomb" style="top: @bomb.StartY%; left: @bomb.StartX%;"></div>
+    }
+    @foreach (var bomb in specialBombs)
+    {
+        <div class="specialBomb" style="top: @bomb.StartY%; left: @bomb.StartX%;"></div>
+    }
+    @foreach (var brick in easyLevel.Bricks)
+    {
+        <div class="brick" style="top: @brick.GetStartX()%; left: @brick.GetStartY()%; width: @brick.GetLength()%px; height: @brick.GetLength()%px;"></div>
+    }
+    @foreach (var box in easyLevel.Boxes)
+    {
+        <div class="box" style="top: @box.GetStartX()%; left: @box.GetStartY()%; width: @box.GetLength()%px; height: @box.GetLength()%px;"></div>
+    }
+</div>
     @if (!arenaPaused)
     {
         <button class="pause-button" @onclick="PauseArena">Pause</button>
@@ -73,6 +83,7 @@ else
     private Player player;
     private List<Bot> bots = new List<Bot>();
     private List<Bomb> bombs = new List<Bomb>();
+    private List<SpecialBomb> specialBombs = new List<SpecialBomb>();
     private int cnt = 0;
 
     bool arenaPaused = false;

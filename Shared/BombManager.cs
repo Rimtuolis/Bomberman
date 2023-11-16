@@ -31,10 +31,20 @@ namespace BomberGopnik.Shared
                 {
                     Console.WriteLine("Setting timer");
                     Thread.Sleep(3000);
-                    bombs[bomb.Id].Remove(bomb);
-                    Console.WriteLine("Exploded");
-                });
-            }
+                    if (bombs[bomb.Id].Contains(bomb)) {
+                        bombs[bomb.Id].FirstOrDefault(n => n.Equals(bomb)).Exploded = true;
+					}
+                    Console.WriteLine("Exploding");
+					Task.Run(() =>
+					{
+						Console.WriteLine("Setting timer_2");
+						Thread.Sleep(1500);
+						bombs[bomb.Id].Remove(bomb);
+						Console.WriteLine("Exploded");
+					});
+				});
+
+			}
         }
 
         public static List<Bomb> GetBombs() {
