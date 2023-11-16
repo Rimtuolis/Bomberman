@@ -10,6 +10,7 @@ namespace BomberGopnik.Shared
 		public int Left { get; set; }
 		public int Points { get; set; }
 		public bool IsPaused { get; set; }
+		public string Name { get; set; }
 		
 		IBombExplosionStrategy BombExplosionStrategy { get; set; }
 
@@ -21,7 +22,7 @@ namespace BomberGopnik.Shared
 			return BombExplosionStrategy.Explode();
 		}
 
-		public Player(string connectionId, string color, int top, int left, int points)
+		public Player(string connectionId, string color, int top, int left, int points, string name)
 		{
 			ConnectionId = connectionId;
 			Color = color;
@@ -29,6 +30,7 @@ namespace BomberGopnik.Shared
 			Left = left;
 			Points = points;
 			BombExplosionStrategy = new SimpleExplosionStrategy();
+			Name = name;
 		}
         public override bool Equals(Object obj)
         {

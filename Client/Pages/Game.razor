@@ -85,7 +85,7 @@
             @foreach (var player in allPlayerScores)
             {
                 <tr>
-                    <td>@player.ConnectionId : </td>
+                    <td>@player.Name : </td>
                     <th>@player.Points</th>
                 </tr>
             }
@@ -245,6 +245,7 @@
         if (hubConnection is not null && !playerJoined)
         {
             playerJoined = true;
+            
             await hubConnection.SendAsync("JoinArena");
         }
     }
