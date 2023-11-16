@@ -1,5 +1,7 @@
 ﻿@page "/"
 @using Microsoft.AspNetCore.SignalR.Client
+@using System.Net;
+@using System.Net.Sockets;
 @inject NavigationManager Navigation
 @implements IAsyncDisposable
 
@@ -27,6 +29,7 @@
         <li>@message</li>
     }
 </ul>
+
 
 @code {
     private HubConnection? hubConnection;
@@ -68,4 +71,5 @@
             await hubConnection.DisposeAsync();
         }
     }
+
 }
