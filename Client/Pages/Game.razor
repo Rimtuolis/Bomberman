@@ -80,15 +80,15 @@
             </tr>
         </thead>
         <tbody>
-
+            
             @foreach (var player in allPlayerScores)
             {
+                
                 <tr>
-                    <td>@player.ConnectionId : </td>
+                    <td>Player: @x</td>
                     <th>@player.Points</th>
                 </tr>
             }
-
         </tbody>
 
     </table>
@@ -97,6 +97,7 @@
 
 
 @code {
+    private int x = 1;
     private HubConnection? hubConnection;
     private List<Player> players = new List<Player>();
     private List<Player> allPlayerScores = PlayerManager.Instance.GetAllPlayers();
