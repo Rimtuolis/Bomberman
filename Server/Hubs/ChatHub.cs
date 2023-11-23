@@ -200,4 +200,10 @@ public class ArenaHub : Hub, IArenaHub
         await _context.Clients.All.SendAsync("AllBombs", BombManager.GetBombs());
 
     }
+    public async Task LoadExplosionGraphics()
+    {
+        // Notify clients to load explosion graphics
+        await Clients.All.SendAsync("ExecuteJavaScript");
+    }
+
 }

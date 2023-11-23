@@ -217,9 +217,10 @@
             StateHasChanged();
         });
 
-        hubConnection.On<Bomb>("PlayerPlacedBomb", (bomb) =>
+        hubConnection.On<Bomb>("PlayerPlacedBomb", async (bomb) =>
         {
             bombs.Add(bomb);
+            await JS.InvokeVoidAsync("Explosion");
             StateHasChanged();
         });
         hubConnection.On<List<SpecialBomb>>("AllSpecialBombs", (newBombs) =>
