@@ -13,14 +13,17 @@ namespace BomberGopnik.Shared
         public bool Exploded { get; set; }
         public int Timer { get; set; }
         public int Radius { get; set; }
-        public double StartX { get; set; }
+        public int StartX { get; set; }
         public int Length { get; set; }
-        public double StartY { get; set; }
+        public int StartY { get; set; }
         public double Power { get; set; }
         public List<int[]> Path { get; set; }
+
+        public bool viewed { get; set; }
         public Abstractbomb(IBombImplementor implementor,int timer, int radius, int startX, int length, int startY, string id, double power)
         {
             bombImplementor = implementor;
+            viewed = false;
             Exploded = false;
             Id = id;
             Timer = timer;

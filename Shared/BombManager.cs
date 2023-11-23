@@ -47,6 +47,16 @@ namespace BomberGopnik.Shared
 			}
         }
 
+        public static void setView(Bomb bomb) {
+			lock (locker)
+			{
+				if (bombs[bomb.Id].Contains(bomb))
+				{
+                    bombs[bomb.Id].First(n => n.Equals(bomb)).viewed = true;
+				}
+			}
+		}
+
         public static List<Bomb> GetBombs() {
 
             List<Bomb> list = new List<Bomb>(); 

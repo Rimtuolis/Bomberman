@@ -39,9 +39,14 @@
 
     protected override async Task OnInitializedAsync()
     {
+
         hubConnection = new HubConnectionBuilder()
-            .WithUrl(Navigation.ToAbsoluteUri("/arenahub"))
+            .WithUrl(Navigation.ToAbsoluteUri("/arenahub")).AddJsonProtocol(options =>
+            {
+                options.PayloadSerializerOptions.PropertyNamingPolicy = null;
+            })
             .Build();
+
 
         hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
         {
@@ -56,9 +61,9 @@
     private async Task Send()
     {
         if (hubConnection is not null)
-            {
-                await hubConnection.SendAsync("SendMessage", userInput, messageInput);
-            }
+        {
+            await hubConnection.SendAsync("SendMessage", userInput, messageInput);
+        }
     }
 
     public bool IsConnected =>

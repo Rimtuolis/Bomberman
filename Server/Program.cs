@@ -20,7 +20,10 @@ builder.Services.AddCors(options =>
         });
 });
 
-builder.Services.AddSignalR();
+builder.Services.AddSignalR()
+	.AddJsonProtocol(options => {
+		options.PayloadSerializerOptions.PropertyNamingPolicy = null;
+	});
 builder.Services.AddResponseCompression(opts =>
 {
 	opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
@@ -28,6 +31,7 @@ builder.Services.AddResponseCompression(opts =>
 });
 builder.Services.AddSingleton<IArenaHub, ArenaHub>();
 builder.Services.AddHostedService<LiveMonitoring>();
+
 
 var app = builder.Build();
 app.UseResponseCompression();

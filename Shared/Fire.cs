@@ -11,6 +11,12 @@ namespace BomberGopnik.Shared
         public int StartX { get; set; }
         public int Length { get; set; }
         public int StartY { get; set; }
+        public DateTime timePlaced { get; set; }
+
+        public Fire()
+        {
+            timePlaced = DateTime.Now;
+        }
 
         public void Build()
         {
