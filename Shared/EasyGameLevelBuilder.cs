@@ -8,7 +8,7 @@ namespace BomberGopnik.Shared
 {
     public class EasyGameLevelBuilder : IGameLevelBuilder
     {
-        private GameLevel level = new GameLevel();
+        private GameLevel level = new GameLevel ();
         private StructureFactory factory = new StructureFactory();
         private IStructureFactory boxFactory = new BoxFactory();
         public void BuildBoxes()
@@ -29,7 +29,7 @@ namespace BomberGopnik.Shared
                 factory.CreateStructure("brickwall", 20, 20, 10),
                 factory.CreateStructure("brickwall", 40, 40, 30),
                 factory.CreateStructure("brickwall", 80, 80, 30),
-                factory.CreateStructure("brickwall", 60, 30, 30)
+                factory.CreateStructure("brickwall", 60, 60, 30)
             };
         }
 

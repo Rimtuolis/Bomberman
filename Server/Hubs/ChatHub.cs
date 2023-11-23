@@ -17,7 +17,7 @@ public class ArenaHub : Hub, IArenaHub
     {
         _context = hubContext;
     }
-    public async Task JoinArena()
+    public async Task JoinArena(string name)
     {
         Player? existingPlayer = null;
         if (PlayerManager.Players.ContainsKey(Context.ConnectionId))
@@ -38,8 +38,9 @@ public class ArenaHub : Hub, IArenaHub
         int playerTop = 50;
         int playerLeft = 50;
         int points = 0;
-        string playerName = "Player " + (PlayerManager.Players.Count()+1);
-        var player = new Player(Context.ConnectionId, playerColor, playerTop, playerLeft, points, playerName);
+        
+        
+        var player = new Player(Context.ConnectionId, playerColor, playerTop, playerLeft, points, name);
 
         PlayerManager.AddPlayer(player);
         var playerObserver = new PlayerObserver(player);
@@ -54,6 +55,11 @@ public class ArenaHub : Hub, IArenaHub
         await Clients.All.SendAsync("PauseArena", subject, player, pausedObservers);
     }
 
+    public async Task SetName(string name)
+    {
+        PlayerManager.AddNames(name);
+        await Clients.All.SendAsync("SetName", PlayerManager.Instance.GetNames());
+    }
     public async Task MovePlayer(Player player, string bricks,string box,  KeyboardEventArgs e)
     {
         if (e != null)

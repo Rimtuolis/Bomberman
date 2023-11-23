@@ -11,132 +11,158 @@
 
 <PageTitle>Game</PageTitle>
 
-<div>
-    <p class="player-counter">Players joined: @players.Count</p>
-</div>
-<div>
 
-    @if (subject.Paused)
-    {
-        @foreach (var player in pausePlayers)
+
+@if (nameSubmited)
+{
+    <div>
+        <p class="player-counter">Players joined: @players.Count</p>
+    </div>
+    <div>
+
+        @if (subject.Paused)
         {
-            <p class="paused-player">@player.ConnectionId has paused the game</p>
-        }
-
-    }
-    else
-    {
-        <p style="color: transparent; font-size: large"> Nematoma</p>
-    }
-
-</div>
-<div class="game-container">
-    <div class="grid-container">
-
-        @for (int row = 0; row < 10; row++)
-        {
-            @for (int col = 0; col < 10; col++)
+            @foreach (var player in pausePlayers)
             {
-                <div class="grid-item"></div>
+                <p class="paused-player">@player.ConnectionId has paused the game</p>
             }
+
+        }
+        else
+        {
+            <p style="color: transparent; font-size: large"> Nematoma</p>
         }
 
+    </div>
+    <div class="game-container">
+        <div class="grid-container">
 
-        @foreach (var player in players)
-        {
-            <div class="player" style="top: @player.Top%; left: @player.Left%; background-color: @player.Color;"></div>
-        }
-        @foreach (var bomb in bombs)
-        {
-            @if (bomb.Exploded)
+            @for (int row = 0; row < 10; row++)
             {
-                <div class="explosion" style="top: @bomb.StartY%; left: @bomb.StartX%;"></div>
-
-                @for (int i = -1; i <= 1; i++)
+                @for (int col = 0; col < 10; col++)
                 {
-                    @for (int j = -1; j <= 1; j++)
+                    <div class="grid-item"></div>
+                }
+            }
+
+
+            @foreach (var player in players)
+            {
+                <div class="player" style="top: @player.Top%; left: @player.Left%; background-color: @player.Color;"></div>
+            }
+            @foreach (var bomb in bombs)
+            {
+                @if (bomb.Exploded)
+                {
+                    <div class="explosion" style="top: @bomb.StartY%; left: @bomb.StartX%;"></div>
+
+                    @for (int i = -1; i <= 1; i++)
                     {
-                        if (Math.Abs(i) > 0 && Math.Abs(j) > 0)
+                        @for (int j = -1; j <= 1; j++)
                         {
-                            <div class="explosion" style="top: @(bomb.StartY + i * 10)%; left: @(bomb.StartX + j * 10)%;"></div>
+                            if (Math.Abs(i) > 0 && Math.Abs(j) > 0)
+                            {
+                                <div class="explosion" style="top: @(bomb.StartY + i * 10)%; left: @(bomb.StartX + j * 10)%;"></div>
+                            }
                         }
                     }
                 }
-            }
-            else
-            {
-                <div class="bomb" style="top: @bomb.StartY%; left: @bomb.StartX%;"></div>
-            }
-
-        }
-        @foreach (var bomb in specialBombs)
-        {
-            <div class="specialBomb" style="top: @bomb.StartY%; left: @bomb.StartX%;"></div>
-        }
-        @foreach (var brick in easyLevel.Bricks)
-        {
-            <div class="brick" style="left: @brick.GetStartX()%; top: @brick.GetStartY()%; width: @brick.GetLength()%px; height: @brick.GetLength()%px;"></div>
-        }
-        @foreach (var box in easyLevel.Boxes)
-        {
-            <div class="box" style="left: @box.GetStartX()%; top: @box.GetStartY()%; width: @box.GetLength()%px; height: @box.GetLength()%px;"></div>
-        }
-
-    </div>
-    <div class="scoreboard">
-        <table id="scoreboard">
-            <thead>
-                <tr>
-                    <th>Scoreboard</th>
-                </tr>
-            </thead>
-            <tbody>
-
-
-                @foreach (var player in allPlayerScores)
+                else
                 {
-                    <tr>
-                        @if (player.ConnectionId == hubConnection.ConnectionId)
-                        {
-                            <td><u><b>@player.Name :</b></u></td>
-                        }
-                        else
-                        {
-                            <td>@player.Name : </td>
-                        }
-                        <th>@player.Points</th>
-                    </tr>
+                    <div class="bomb" style="top: @bomb.StartY%; left: @bomb.StartX%;"></div>
                 }
 
-            </tbody>
-        </table>
+            }
+            @foreach (var bomb in specialBombs)
+            {
+                <div class="specialBomb" style="top: @bomb.StartY%; left: @bomb.StartX%;"></div>
+            }
+            @foreach (var brick in easyLevel.Bricks)
+            {
+                <div class="brick" style="left: @brick.GetStartX()%; top: @brick.GetStartY()%; width: @brick.GetLength()%px; height: @brick.GetLength()%px;"></div>
+            }
+            @foreach (var box in easyLevel.Boxes)
+            {
+                <div class="box" style="left: @box.GetStartX()%; top: @box.GetStartY()%; width: @box.GetLength()%px; height: @box.GetLength()%px;"></div>
+            }
+
+        </div>
+        <div class="scoreboard">
+            <table id="scoreboard">
+                <thead>
+                    <tr>
+                        <th>Scoreboard</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+
+                    @foreach (var player in players)
+                    {
+                        <tr>
+                            @if (player.ConnectionId == hubConnection.ConnectionId)
+                            {
+                                <td><u><b>@player.Name :</b></u></td>
+                            }
+                            else
+                            {
+                                <td>@player.Name : </td>
+                            }
+                            <th>@player.Points</th>
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+
+        </div>
 
     </div>
+    @if (!playerJoined)
+    {
+        <button class="join-button" @onclick="JoinArena" disabled="@(!IsConnected && playerJoined)">Join Arena</button>
+    }
+    @if (playerJoined && IsConnected)
+    {
 
-</div>
-@if (!playerJoined)
-{
-    <button class="join-button" @onclick="JoinArena" disabled="@(!IsConnected && playerJoined)">Join Arena</button>
+        @if (!pausePlayers.Contains(this.getConnectedPlayer()))
+        {
+            <button class="pause-button" @onclick="PauseArena">Pause</button>
+        }
+        else
+        {
+            <button class="pause-button" @onclick="PauseArena">Unpause</button>
+        }
+    }
+
 }
-@if (playerJoined && IsConnected)
+else
 {
+    <label for="username">Enter your nickname:</label>
+    <br>
+    <input type="text" id="username" @bind="@name">
+    <br>
+    <br>
+    @if (swearWordSubmitted)
+    {
+        <p class="paused-player">Dont enter swear words!</p>
+    }
+    @if (nameExists)
+    {
+        <p class="paused-player">Player with this nickname exists.</p>
+    }
+    <button class="join-button" @onclick="@PressedSubmit">Submit</button>
 
-    @if (!pausePlayers.Contains(this.getConnectedPlayer()))
-    {
-        <button class="pause-button" @onclick="PauseArena">Pause</button>
-    }
-    else
-    {
-        <button class="pause-button" @onclick="PauseArena">Unpause</button>
-    }
 }
 
 
 
 
 @code {
+
     private HubConnection? hubConnection;
     private List<Player> players = new List<Player>();
+    private List<string> lobbyNames = new List<string>();
     private List<Player> allPlayerScores = PlayerManager.Instance.GetAllPlayers();
     private IGameLevelBuilder builder = new EasyGameLevelBuilder();
     private GameLevel easyLevel = new GameLevel();
@@ -153,6 +179,10 @@
     private List<Bomb> bombs = new List<Bomb>();
     private List<SpecialBomb> specialBombs = new List<SpecialBomb>();
     private PlayerManagerSubject subject = new PlayerManagerSubject();
+    private string name = "";
+    bool nameSubmited = false;
+    bool swearWordSubmitted = false;
+    bool nameExists = false;
     bool playerJoined = false;
     bool arenaPaused = false;
     bool placedSpecialbomb = false;
@@ -174,6 +204,11 @@
             .WithUrl(Navigation.ToAbsoluteUri("/arenahub"))
             .Build();
 
+        hubConnection.On<List<string>>("SetName",  (name) =>
+        {
+            lobbyNames = name;
+            StateHasChanged();
+        });
         hubConnection.On<List<Player>>("AssignPlayer", (existingPlayers) =>
         {
             players = existingPlayers;
@@ -239,6 +274,8 @@
             specialBombs.Remove(bomb);
             StateHasChanged();
         });
+
+
         await hubConnection.StartAsync();
 
     }
@@ -275,12 +312,48 @@
             await hubConnection.SendAsync("PauseArena", subject, tempPlayer, pausePlayers);
         }
     }
+    private async Task PressedSubmit()
+    {
+        Context context = new Context { Input = name };
+        IExpression expression = new SwearWordExpression();
+        Interpreter interpreter = new Interpreter(expression);
+
+        if (interpreter.Interpret(context))
+        {
+
+            swearWordSubmitted = true;
+        }
+        else
+        {
+
+            await hubConnection.SendAsync("SetName", name);
+            
+            foreach(var pl in lobbyNames)
+            {
+                Console.WriteLine(name + " "+ pl);
+            }
+            //Console.WriteLine(temp);
+            if (!PlayerManager.Instance.GetNames().Exists(x => x.Equals(name)))
+            {
+                swearWordSubmitted = false;
+
+                nameSubmited = true;
+                Console.WriteLine(lobbyNames.Count);
+                StateHasChanged();
+            }
+            else
+            {
+                nameExists = true;
+            }
+
+        }
+    }
     private async Task JoinArena()
     {
         if (hubConnection is not null && !playerJoined)
         {
             playerJoined = true;
-            await hubConnection.SendAsync("JoinArena");
+            await hubConnection.SendAsync("JoinArena", name);
         }
     }
     [JSInvokable("KeyDown")]

@@ -11,6 +11,7 @@ namespace BomberGopnik.Shared
 	{
 		private static readonly Dictionary<String, Player> players = new Dictionary<string, Player>();
 		private static readonly object locker = new object();
+        private static List<string> lobbyNames = new List<string>();
       
 		public static Dictionary<String, Player> Players => players;
 
@@ -21,6 +22,14 @@ namespace BomberGopnik.Shared
 				players[player.ConnectionId] = player;
 			}
 		}
+        public static void AddNames(string name)
+        {
+            lock(locker)
+            {
+                lobbyNames.Add(name);
+            }
+        }
+
        
         public static void EditPlayer(Player player)
 		{
@@ -70,6 +79,10 @@ namespace BomberGopnik.Shared
         public List<Player> GetAllPlayers()
         {
             return players.Values.ToList();
+        }
+        public List<string> GetNames()
+        {
+            return lobbyNames;
         }
     }
 }
