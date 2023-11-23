@@ -204,11 +204,6 @@ else
             .WithUrl(Navigation.ToAbsoluteUri("/arenahub"))
             .Build();
 
-        hubConnection.On<List<string>>("SetName",  (name) =>
-        {
-            lobbyNames = name;
-            StateHasChanged();
-        });
         hubConnection.On<List<Player>>("AssignPlayer", (existingPlayers) =>
         {
             players = existingPlayers;
@@ -326,26 +321,27 @@ else
         }
         else
         {
+              await hubConnection.SendAsync("SetName", name);
 
-            await hubConnection.SendAsync("SetName", name);
-            
-            foreach(var pl in lobbyNames)
-            {
-                Console.WriteLine(name + " "+ pl);
-            }
-            //Console.WriteLine(temp);
-            if (!PlayerManager.Instance.GetNames().Exists(x => x.Equals(name)))
+
+            hubConnection.On<List<string>>("SetName", (names) =>
+        {
+            lobbyNames = names;
+            StateHasChanged();
+            if (lobbyNames.Count(s => s == name) == 1)
             {
                 swearWordSubmitted = false;
 
                 nameSubmited = true;
-                Console.WriteLine(lobbyNames.Count);
-                StateHasChanged();
+               
             }
             else
             {
                 nameExists = true;
+
             }
+        });
+
 
         }
     }

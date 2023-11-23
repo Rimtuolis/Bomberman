@@ -58,7 +58,7 @@ public class ArenaHub : Hub, IArenaHub
     public async Task SetName(string name)
     {
         PlayerManager.AddNames(name);
-        await Clients.All.SendAsync("SetName", PlayerManager.Instance.GetNames());
+        await Clients.Caller.SendAsync("SetName", PlayerManager.Instance.GetNames());
     }
     public async Task MovePlayer(Player player, string bricks,string box,  KeyboardEventArgs e)
     {
