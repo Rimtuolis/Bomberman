@@ -109,7 +109,7 @@ public class ArenaHub : Hub, IArenaHub
 
 				Console.WriteLine(bomb.StartX + " - " + bomb.StartY);
 				Console.WriteLine(player.ConnectionId + " : " + PlayerManager.Instance.GetScore(player) + " : " + player.Points);
-
+				cleanArena(tempArena);
 
 				await Clients.All.SendAsync("UpdatedArena", SerializeArena(tempArena));
 
@@ -169,8 +169,6 @@ public class ArenaHub : Hub, IArenaHub
 		
 		//keturios puses
 		bool legalMove = arena.grid[valueX/10, valueY/10] == null && arena.grid[ (valueX + 5) / 10, (valueY + 5) / 10] == null;
-
-		cleanArena(arena);
 
 		switch (valueX)
 		{

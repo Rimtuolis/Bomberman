@@ -172,6 +172,7 @@ else
     private Player pausedPlayer, tempPlayer, newPlayer, connectedPlayer;
     private PlayerObserver? playerObserverer;
     public List<Player> pausePlayers = new List<Player>();
+    private List<string> lobbyNames = new List<string>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -210,13 +211,13 @@ else
         hubConnection.On<string>("UpdatedArena", (temp) =>
         {
             arena = getArena(temp);
-            await JS.InvokeVoidAsync("Explosion");
             StateHasChanged();
         });
         hubConnection.On<List<Bomb>>("AllBombs", async (newBombs) =>
         {
             arena.bombs = newBombs;
             await hubConnection.SendAsync("HandleExplosion", SerializeArena());
+            await JS.InvokeVoidAsync("Explosion");
             StateHasChanged();
         });
 
