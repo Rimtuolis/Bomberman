@@ -11,35 +11,39 @@
 
 <PageTitle>Game</PageTitle>
 
-<div>
-    <p class="player-counter">Players joined: @arena.players.Count</p>
-</div>
-<div>
 
-    @if (subject.Paused)
-    {
-        @foreach (var player in pausePlayers)
+
+@if (nameSubmited)
+{
+    <div>
+        <p class="player-counter">Players joined: @arena.players.Count</p>
+    </div>
+    <div>
+
+        @if (subject.Paused)
         {
-            <p class="paused-player">@player.ConnectionId has paused the game</p>
-        }
-
-    }
-    else
-    {
-        <p style="color: transparent; font-size: large"> Nematoma</p>
-    }
-
-</div>
-<div class="game-container">
-    <div class="grid-container">
-
-        @for (int row = 0; row < 10; row++)
-        {
-            @for (int col = 0; col < 10; col++)
+            @foreach (var player in pausePlayers)
             {
-                <div class="grid-item"></div>
+                <p class="paused-player">@player.ConnectionId has paused the game</p>
             }
+
         }
+        else
+        {
+            <p style="color: transparent; font-size: large"> Nematoma</p>
+        }
+
+    </div>
+    <div class="game-container">
+        <div class="grid-container">
+
+            @for (int row = 0; row < 10; row++)
+            {
+                @for (int col = 0; col < 10; col++)
+                {
+                    <div class="grid-item"></div>
+                }
+            }
 
 
         @foreach (var player in arena.players)
@@ -102,35 +106,55 @@
                     </tr>
                 }
 
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+
+        </div>
 
     </div>
+    @if (!playerJoined)
+    {
+        <button class="join-button" @onclick="JoinArena" disabled="@(!IsConnected && playerJoined)">Join Arena</button>
+    }
+    @if (playerJoined && IsConnected)
+    {
 
-</div>
-@if (!playerJoined)
-{
-    <button class="join-button" @onclick="JoinArena" disabled="@(!IsConnected && playerJoined)">Join Arena</button>
+        @if (!pausePlayers.Contains(this.getConnectedPlayer()))
+        {
+            <button class="pause-button" @onclick="PauseArena">Pause</button>
+        }
+        else
+        {
+            <button class="pause-button" @onclick="PauseArena">Unpause</button>
+        }
+    }
+
 }
-@if (playerJoined && IsConnected)
+else
 {
+    <label for="username">Enter your nickname:</label>
+    <br>
+    <input type="text" id="username" @bind="@name">
+    <br>
+    <br>
+    @if (swearWordSubmitted)
+    {
+        <p class="paused-player">Dont enter swear words!</p>
+    }
+    @if (nameExists)
+    {
+        <p class="paused-player">Player with this nickname exists.</p>
+    }
+    <button class="join-button" @onclick="@PressedSubmit">Submit</button>
 
-    @if (!pausePlayers.Contains(this.getConnectedPlayer()))
-    {
-        <button class="pause-button" @onclick="PauseArena">Pause</button>
-    }
-    else
-    {
-        <button class="pause-button" @onclick="PauseArena">Unpause</button>
-    }
 }
 
 
 
 
 @code {
+
     private HubConnection? hubConnection;
-    //private List<Player> players = PlayerManager.Instance.GetAllPlayers();
     private IGameLevelBuilder builder = new EasyGameLevelBuilder();
     private static GameLevel easyLevel = new GameLevel();
 
@@ -139,7 +163,10 @@
 
     private List<SpecialBomb> specialBombs = new List<SpecialBomb>();
     private PlayerManagerSubject subject = new PlayerManagerSubject();
-
+    private string name = "";
+    bool nameSubmited = false;
+    bool swearWordSubmitted = false;
+    bool nameExists = false;
     bool playerJoined = false;
     bool placedSpecialbomb = false;
     private Player pausedPlayer, tempPlayer, newPlayer, connectedPlayer;
@@ -183,6 +210,7 @@
         hubConnection.On<string>("UpdatedArena", (temp) =>
         {
             arena = getArena(temp);
+            await JS.InvokeVoidAsync("Explosion");
             StateHasChanged();
         });
         hubConnection.On<List<Bomb>>("AllBombs", async (newBombs) =>
@@ -216,6 +244,8 @@
             specialBombs.Remove(bomb);
             StateHasChanged();
         });
+
+
         await hubConnection.StartAsync();
 
     }
@@ -252,12 +282,49 @@
             await hubConnection.SendAsync("PauseArena", subject, tempPlayer, pausePlayers);
         }
     }
+    private async Task PressedSubmit()
+    {
+        Context context = new Context { Input = name };
+        IExpression expression = new SwearWordExpression();
+        Interpreter interpreter = new Interpreter(expression);
+
+        if (interpreter.Interpret(context))
+        {
+
+            swearWordSubmitted = true;
+        }
+        else
+        {
+              await hubConnection.SendAsync("SetName", name);
+
+
+            hubConnection.On<List<string>>("SetName", (names) =>
+        {
+            lobbyNames = names;
+            StateHasChanged();
+            if (lobbyNames.Count(s => s == name) == 1)
+            {
+                swearWordSubmitted = false;
+
+                nameSubmited = true;
+               
+            }
+            else
+            {
+                nameExists = true;
+
+            }
+        });
+
+
+        }
+    }
     private async Task JoinArena()
     {
         if (hubConnection is not null && !playerJoined)
         {
             playerJoined = true;
-            await hubConnection.SendAsync("JoinArena");
+            await hubConnection.SendAsync("JoinArena", name);
         }
     }
 

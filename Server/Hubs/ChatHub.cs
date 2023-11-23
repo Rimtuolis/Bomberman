@@ -12,19 +12,19 @@ using System.Text.Json.Serialization;
 
 public class ArenaHub : Hub, IArenaHub
 {
-	private readonly Random random = new Random();
-	private readonly IHubContext<ArenaHub> _context;
-	public ArenaHub(IHubContext<ArenaHub> hubContext)
-	{
-		_context = hubContext;
-	}
-	public async Task JoinArena()
-	{
-		Player? existingPlayer = null;
-		if (PlayerManager.Players.ContainsKey(Context.ConnectionId))
-		{
-			existingPlayer = PlayerManager.Players[Context.ConnectionId];
-		}
+    private readonly Random random = new Random();
+    private readonly IHubContext<ArenaHub> _context;
+    public ArenaHub(IHubContext<ArenaHub> hubContext)
+    {
+        _context = hubContext;
+    }
+    public async Task JoinArena(string name)
+    {
+        Player? existingPlayer = null;
+        if (PlayerManager.Players.ContainsKey(Context.ConnectionId))
+        {
+            existingPlayer = PlayerManager.Players[Context.ConnectionId];
+        }
 
 		if (existingPlayer != null)
 		{
@@ -35,15 +35,16 @@ public class ArenaHub : Hub, IArenaHub
 		string[] colors = { "#ffffff00", "#ff0000", "#00ff00", "#0000ff", "#ff00ff", "#00ffff" };
 		string playerColor = colors[0];
 
+        
+        int playerTop = 50;
+        int playerLeft = 50;
+        int points = 0;
+        
+        
+        var player = new Player(Context.ConnectionId, playerColor, playerTop, playerLeft, points, name);
 
-		int playerTop = 50;
-		int playerLeft = 50;
-		int points = 0;
-		string playerName = "Player " + (PlayerManager.Players.Count() + 1);
-		var player = new Player(Context.ConnectionId, playerColor, playerTop, playerLeft, points, playerName);
-
-		PlayerManager.AddPlayer(player);
-		var playerObserver = new PlayerObserver(player);
+        PlayerManager.AddPlayer(player);
+        var playerObserver = new PlayerObserver(player);
 
 		await Clients.Caller.SendAsync("AssignPlayer", PlayerManager.Players.Values.ToList());
 		await Clients.Others.SendAsync("PlayerJoined", player, playerObserver);
@@ -55,6 +56,11 @@ public class ArenaHub : Hub, IArenaHub
 		await Clients.All.SendAsync("PauseArena", subject, player, pausedObservers);
 	}
 
+    public async Task SetName(string name)
+    {
+        PlayerManager.AddNames(name);
+        await Clients.Caller.SendAsync("SetName", PlayerManager.Instance.GetNames());
+    }
 	public async Task MovePlayer(Player player, string arena, KeyboardEventArgs e)
 	{
 		if (e != null)
@@ -278,5 +284,11 @@ public class ArenaHub : Hub, IArenaHub
 
 		await base.OnDisconnectedAsync(exception);
 
-	}
+    }
+    public async Task LoadExplosionGraphics()
+    {
+        // Notify clients to load explosion graphics
+        await Clients.All.SendAsync("ExecuteJavaScript");
+    }
+
 }

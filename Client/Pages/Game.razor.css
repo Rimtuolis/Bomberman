@@ -31,10 +31,10 @@
     flex-direction: row;
     justify-content: space-between;
 }
+
 .grid-item {
     width: 30px;
     height: 30px;
-    
     background: url(grass.png); /* Set the path to your brick sprite */
     background-color: #cccccc;
 }
@@ -69,14 +69,6 @@
     left: 50%;
     position: absolute;
 }
-
-.explosion {
-    width: 30px;
-    height: 30px;
-    background: url(explosion.png);
-    position: absolute;
-}
-
 
 .specialBomb {
     width: 15px;
