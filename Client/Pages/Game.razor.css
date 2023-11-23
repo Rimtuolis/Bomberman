@@ -70,14 +70,6 @@
     position: absolute;
 }
 
-.explosion {
-    width: 30px;
-    height: 30px;
-    background: url(explosion.png);
-    position: absolute;
-}
-
-
 .specialBomb {
     width: 15px;
     height: 10px;
