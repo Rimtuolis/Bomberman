@@ -234,22 +234,23 @@ public class ArenaHub : Hub, IArenaHub
 
 		for (int i = 0; i < 10; i++) {
 			for (int j = 0; j < 10; j++) {
-				if (arena.grid[i, j] is Fire) {
+				if (temp.grid[i, j] is Fire) {
 					if ((DateTime.Now - (arena.grid[i, j] as Fire).timePlaced).TotalMilliseconds >= 1500) {
-						if (arena.powerups[i,j] == 1)
+						if (temp.powerups[i,j] == 1)
 						{
                             IStructure powerup = new SpeedPoweerUp();
-                            arena.grid[i, j] = powerup;
+							temp.grid[i, j] = powerup;
                         }
 						else
 						{
-                            arena.grid[i, j] = null;
+							temp.grid[i, j] = null;
                         }
                     }
 				}
 			}
 		}
-	
+
+		return temp;
 	}
 
 	public async Task HandleExplosion(string arena)
