@@ -80,7 +80,9 @@
                 else if (arena.grid[i, j] is Fire) {
                     <div class="explosion" style="left: @(i*10)%; top: @(j*10)%; width: @arena.grid[i, j].GetLength()%px; height: @arena.grid[i, j].GetLength()%px;"></div>
                 }
-                
+                else if (arena.grid[i, j] is SpeedPoweerUp) {
+                    <div class="powerup" style="left: @(i*10)%; top: @(j*10)%; width: @arena.grid[i, j].GetLength()%px; height: @arena.grid[i, j].GetLength()%px;"></div>
+                }
             }
         }
 

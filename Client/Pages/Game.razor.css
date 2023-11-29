@@ -94,6 +94,12 @@
     background-color: #cccccc;
     position: absolute;
 }
+.powerup {
+    width: 30px;
+    height: 30px;
+    background: url(powerup.png); /* Set the path to your brick sprite */
+    position: absolute;
+}
 .pause-button {
     margin-top: 20px; /* Add some space between arena and button */
     background-color: #007bff; /* Blue button color */

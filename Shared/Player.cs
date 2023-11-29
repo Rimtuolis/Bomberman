@@ -12,6 +12,7 @@ namespace BomberGopnik.Shared
 		public bool IsPaused { get; set; }
 		public string Name { get; set; }
 		public string Skin { get; set; }
+		public bool ExtraSpeed { get; set; }
 		
 		IBombExplosionStrategy BombExplosionStrategy { get; set; }
 
@@ -32,6 +33,8 @@ namespace BomberGopnik.Shared
 			Points = points;
 			BombExplosionStrategy = new SimpleExplosionStrategy();
 			Name = name;
+            ExtraSpeed = false;
+
 			Skin = skin;
 		}
         public override bool Equals(Object obj)
