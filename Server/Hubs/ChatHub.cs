@@ -2,23 +2,25 @@
 using System.Numerics;
 using BomberGopnik.Shared;
 namespace BomberGopnik.Server.Hubs;
-
+using System.Timers;
 using BomberGopnik.Client.Pages;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
 using Newtonsoft.Json;
 using System.Text.Json.Serialization;
+using static System.Net.Mime.MediaTypeNames;
 
 public class ArenaHub : Hub, IArenaHub
 {
     private readonly Random random = new Random();
     private readonly IHubContext<ArenaHub> _context;
+    private Timer extraSpeedTimer;
     public ArenaHub(IHubContext<ArenaHub> hubContext)
     {
         _context = hubContext;
     }
-    public async Task JoinArena(string name)
+    public async Task JoinArena(string name, string skin)
     {
         Player? existingPlayer = null;
         if (PlayerManager.Players.ContainsKey(Context.ConnectionId))
@@ -41,7 +43,7 @@ public class ArenaHub : Hub, IArenaHub
         int points = 0;
         
         
-        var player = new Player(Context.ConnectionId, playerColor, playerTop, playerLeft, points, name);
+        var player = new Player(Context.ConnectionId, playerColor, playerTop, playerLeft, points, name, skin);
 
         PlayerManager.AddPlayer(player);
         var playerObserver = new PlayerObserver(player);
@@ -68,15 +70,20 @@ public class ArenaHub : Hub, IArenaHub
 			Arena tempArena = getArena(arena);
 			IMovement movement = CreateMovement(e);
 			changeLocation(movement, player, tempArena);
-
 			PlayerManager.EditPlayer(player);
 			tempArena.players = PlayerManager.Instance.GetAllPlayers();
 
 			await Clients.All.SendAsync("UpdatedArena", SerializeArena(tempArena));
 		}
 	}
+    private async void RemoveSpeed(Player player)
+    {
+        await Task.Delay(2000);
+        player.ExtraSpeed = true;
+    }
 
-	private IMovement CreateMovement(KeyboardEventArgs e)
+
+    private IMovement CreateMovement(KeyboardEventArgs e)
 	{
 		if (IsArrowKey(e.Code))
 		{
@@ -162,15 +169,32 @@ public class ArenaHub : Hub, IArenaHub
 	}
 	private void changeLocation(IMovement movement, Player player, Arena arena)
 	{
-		int valueX = player.Left + movement.Dx;
-		int valueY = player.Top + movement.Dy;
+        int valueX = player.Left + movement.Dx;
+        int valueY = player.Top + movement.Dy;
+
+        if (player.ExtraSpeed)
+		{
+            valueX = player.Left + (movement.Dx * 2);
+            valueY = player.Top + (movement.Dy * 2);
+        }
+
 
 		Console.WriteLine($"x:{player.Left + movement.Dx}  y:{player.Top + movement.Dy}");
 		
 		//keturios puses
-		bool legalMove = arena.grid[valueX/10, valueY/10] == null && arena.grid[ (valueX + 5) / 10, (valueY + 5) / 10] == null;
+		bool legalMove = (arena.grid[valueX/10, valueY/10] == null || arena.grid[valueX / 10, valueY / 10] is SpeedPoweerUp)
+					  && (arena.grid[ (valueX + 5) / 10, (valueY + 5) / 10] == null || arena.grid[(valueX + 5) / 10, (valueY + 5) / 10] is SpeedPoweerUp);
 
-		switch (valueX)
+
+		if(arena.grid[valueX / 10, valueY / 10] is SpeedPoweerUp || arena.grid[(valueX + 5) / 10, (valueY + 5) / 10] is SpeedPoweerUp)
+		{
+			arena.grid[valueX / 10, valueY / 10] = null;
+			arena.grid[(valueX + 5) / 10, (valueY + 5) / 10] = null;
+			arena.powerups[valueX / 10,valueY / 10] = 0;
+            player.ExtraSpeed = true;
+        }
+
+        switch (valueX)
 		{
 			case < 0:
 				player.Left = 0;
@@ -210,15 +234,21 @@ public class ArenaHub : Hub, IArenaHub
 
 		for (int i = 0; i < 10; i++) {
 			for (int j = 0; j < 10; j++) {
-				if (temp.grid[i, j] is Fire) {
-					if ((DateTime.Now - (temp.grid[i, j] as Fire).timePlaced).TotalMilliseconds >= 1500) {
-						temp.grid[i, j] = new Empty();
-					}
+				if (arena.grid[i, j] is Fire) {
+					if ((DateTime.Now - (arena.grid[i, j] as Fire).timePlaced).TotalMilliseconds >= 1500) {
+						if (arena.powerups[i,j] == 1)
+						{
+                            IStructure powerup = new SpeedPoweerUp();
+                            arena.grid[i, j] = powerup;
+                        }
+						else
+						{
+                            arena.grid[i, j] = null;
+                        }
+                    }
 				}
 			}
 		}
-
-		return temp;
 	
 	}
 
@@ -254,9 +284,13 @@ public class ArenaHub : Hub, IArenaHub
 					for (int y = length - minY; y <= length + maxY; y++)
 					{
 						if (path[y][x] > 0) {
-							IStructure fire = new Fire();
+                            if (tempArena.grid[i - length + x, j - length + y] is Box)
+                            {
+								tempArena.powerups[i - length + x, j - length + y] = 1;
+                            }
+                            IStructure fire = new Fire();
 							tempArena.grid[i - length + x, j - length + y] = fire;
-						}
+                        }
 					}
 				}
 			}
@@ -266,7 +300,8 @@ public class ArenaHub : Hub, IArenaHub
 
 		await Clients.All.SendAsync("UpdatedArena", SerializeArena(tempArena));
 	}
-	private Arena getArena(string arena) => JsonConvert.DeserializeObject<Arena>(arena, new JsonSerializerSettings()
+
+    private Arena getArena(string arena) => JsonConvert.DeserializeObject<Arena>(arena, new JsonSerializerSettings()
 	{
 		TypeNameHandling = TypeNameHandling.Auto
 	});
