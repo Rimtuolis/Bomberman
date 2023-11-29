@@ -109,7 +109,7 @@ public class ArenaHub : Hub, IArenaHub
 
 				Console.WriteLine(bomb.StartX + " - " + bomb.StartY);
 				Console.WriteLine(player.ConnectionId + " : " + PlayerManager.Instance.GetScore(player) + " : " + player.Points);
-				cleanArena(tempArena);
+				tempArena = cleanArena(tempArena);
 
 				await Clients.All.SendAsync("UpdatedArena", SerializeArena(tempArena));
 
@@ -204,17 +204,21 @@ public class ArenaHub : Hub, IArenaHub
 
 	}
 
-	private void cleanArena(Arena arena) {
+	private Arena cleanArena(Arena arena) {
+
+		Arena temp = arena;
 
 		for (int i = 0; i < 10; i++) {
 			for (int j = 0; j < 10; j++) {
-				if (arena.grid[i, j] is Fire) {
-					if ((DateTime.Now - (arena.grid[i, j] as Fire).timePlaced).TotalMilliseconds >= 1500) {
-						arena.grid[i, j] = null;
+				if (temp.grid[i, j] is Fire) {
+					if ((DateTime.Now - (temp.grid[i, j] as Fire).timePlaced).TotalMilliseconds >= 1500) {
+						temp.grid[i, j] = new Empty();
 					}
 				}
 			}
 		}
+
+		return temp;
 	
 	}
 
