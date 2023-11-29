@@ -18,7 +18,7 @@ public class ArenaHub : Hub, IArenaHub
     {
         _context = hubContext;
     }
-    public async Task JoinArena(string name)
+    public async Task JoinArena(string name, string skin)
     {
         Player? existingPlayer = null;
         if (PlayerManager.Players.ContainsKey(Context.ConnectionId))
@@ -41,7 +41,7 @@ public class ArenaHub : Hub, IArenaHub
         int points = 0;
         
         
-        var player = new Player(Context.ConnectionId, playerColor, playerTop, playerLeft, points, name);
+        var player = new Player(Context.ConnectionId, playerColor, playerTop, playerLeft, points, name, skin);
 
         PlayerManager.AddPlayer(player);
         var playerObserver = new PlayerObserver(player);

@@ -50,16 +50,8 @@
 }
 
 
-/* Optional: Style for a player inside the arena */
-.player {
-    width: 30px;
-    height: 30px;
-    background: url(YellowPlayer.png); /* Red player */
-    position: absolute;
-    /*transition: top 0.1s, left 0.1s;*/
-    
 
-}
+
 
 .bomb {
     width: 30px;

@@ -48,7 +48,12 @@
 
         @foreach (var player in arena.players)
         {
-            <div class="player" style="top: @player.Top%; left: @player.Left%; background-color: @player.Color;"></div>
+
+                <div class="player" style="width: 30px; height: 30px; position: absolute; top: @player.Top%; left: @player.Left%; background-color: @player.Color; background: url('@player.Skin');">
+                    <div class="playerlabel" style="font-size: 10px; color:cyan; text-align: center; transform: translateY(-80%);">
+                        @player.Name
+                    </div>
+            </div>
         }
         @foreach (var bomb in arena.bombs)
         {
@@ -173,7 +178,16 @@ else
     private PlayerObserver? playerObserverer;
     public List<Player> pausePlayers = new List<Player>();
     private List<string> lobbyNames = new List<string>();
-
+    static List<string> backgrounds = new List<string>() {
+        "YellowPlayer.png",
+        "BluePlayer.png",
+        "RedPlayer.png",
+        "GreenPlayer.png",
+    };
+    static Random random = new Random();
+    static int randomIndex = random.Next(0, backgrounds.Count);
+    static string randomBackground = backgrounds[randomIndex];
+    // Add more image URLs as needed
     protected override async Task OnInitializedAsync()
     {
         builder.BuildBoxes();
@@ -189,6 +203,7 @@ else
 
         hubConnection.On<List<Player>>("AssignPlayer", (existingPlayers) =>
         {
+            
             arena.players = existingPlayers;
             playerJoined = true;
             StateHasChanged();
@@ -196,6 +211,7 @@ else
 
         hubConnection.On<Player, PlayerObserver>("PlayerJoined", (player, playerObserver) =>
         {
+            
             playerObserverer = playerObserver;
             arena.players.Add(player);
             StateHasChanged();
@@ -324,8 +340,9 @@ else
     {
         if (hubConnection is not null && !playerJoined)
         {
+
             playerJoined = true;
-            await hubConnection.SendAsync("JoinArena", name);
+            await hubConnection.SendAsync("JoinArena", name, randomBackground);
         }
     }
 
