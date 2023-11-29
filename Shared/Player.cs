@@ -11,6 +11,7 @@ namespace BomberGopnik.Shared
 		public int Points { get; set; }
 		public bool IsPaused { get; set; }
 		public string Name { get; set; }
+		public bool ExtraSpeed { get; set; }
 		
 		IBombExplosionStrategy BombExplosionStrategy { get; set; }
 
@@ -31,7 +32,9 @@ namespace BomberGopnik.Shared
 			Points = points;
 			BombExplosionStrategy = new SimpleExplosionStrategy();
 			Name = name;
-		}
+            ExtraSpeed = false;
+
+        }
         public override bool Equals(Object obj)
         {
             //Check for null and compare run-time types.

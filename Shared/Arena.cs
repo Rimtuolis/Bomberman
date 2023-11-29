@@ -12,6 +12,8 @@ namespace BomberGopnik.Shared
 
         public List<Player> players = new List<Player>();
         public List<Bomb> bombs = new List<Bomb>();
+        //public Dictionary<int,List<int>> powerups = new Dictionary<int, List<int>>();
+        public int[,] powerups = new int[10,10];
 
         public Arena(GameLevel level)
         {
@@ -25,6 +27,10 @@ namespace BomberGopnik.Shared
         }
         public Arena()
         {
+        }
+        public IIterator<IStructure> CreateIterator()
+        {
+            return new ArenaIterator(this);
         }
     }
 }
