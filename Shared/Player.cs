@@ -13,7 +13,8 @@ namespace BomberGopnik.Shared
 		public string Name { get; set; }
 		public string Skin { get; set; }
 		public bool ExtraSpeed { get; set; }
-		
+		public bool Dead { get; set; }
+
 		IBombExplosionStrategy BombExplosionStrategy { get; set; }
 
 		public void setBombExplosionStrategy(IBombExplosionStrategy strategy) {
@@ -34,6 +35,7 @@ namespace BomberGopnik.Shared
 			BombExplosionStrategy = new SimpleExplosionStrategy();
 			Name = name;
             ExtraSpeed = false;
+			Dead = false;
 
 			Skin = skin;
 		}

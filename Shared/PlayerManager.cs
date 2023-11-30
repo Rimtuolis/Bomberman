@@ -35,7 +35,12 @@ namespace BomberGopnik.Shared
 		{
 			players[player.ConnectionId] = player;
 		}
-        private static PlayerManager _instance;
+
+		public static void RemovePlayer(Player player)
+		{
+			players.Remove(player.ConnectionId);
+		}
+		private static PlayerManager _instance;
         
         public static PlayerManager Instance
         {

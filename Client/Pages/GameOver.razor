@@ -14,7 +14,7 @@
     private string DecoratedMessage = "Try again!";
     private string MessageCssClass = "message";
 
-    private IGameOverScreenDecorator decorator = new WinningDecorator();
+    private IGameOverScreenDecorator decorator = new LosingDecorator();
 
     protected override void OnInitialized()
     {

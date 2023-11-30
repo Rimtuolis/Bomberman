@@ -27,5 +27,10 @@ namespace BomberGopnik.Shared
             Path = player.executeStrategy();
             bombImplementor.placeBomb(this, player);
         }
+
+        public override string? ToString()
+        {
+            return Id;
+        }
     }
 }

@@ -46,72 +46,76 @@
             }
 
 
-        @foreach (var player in arena.players)
-        {
+            @foreach (var player in arena.players)
+            {
 
                 <div class="player" style="width: 30px; height: 30px; position: absolute; top: @player.Top%; left: @player.Left%; background-color: @player.Color; background: url('@player.Skin');">
                     <div class="playerlabel" style="font-size: 10px; color:cyan; text-align: center; transform: translateY(-80%);">
                         @player.Name
                     </div>
-            </div>
-        }
-        @foreach (var bomb in arena.bombs)
-        {
-            @if (!bomb.Exploded)
-            {
-                <div class="bomb" style="top: @bomb.StartY%; left: @bomb.StartX%;"></div>
+                </div>
             }
-
-        }
-        @foreach (var bomb in specialBombs)
-        {
-            <div class="specialBomb" style="top: @bomb.StartY%; left: @bomb.StartX%;"></div>
-        }
-        @for (int i = 0; i < 10; i++)
-        {
-            @for (int j = 0; j < 10; j++)
+            @foreach (var bomb in arena.bombs)
             {
-                if (arena.grid[i, j] is Box) {
-                    <div class="box" style="left: @arena.grid[i, j].GetStartX()%; top: @arena.grid[i, j].GetStartY()%; width: @arena.grid[i, j].GetLength()%px; height: @arena.grid[i, j].GetLength()%px;"></div>
-                }
-                else if (arena.grid[i, j] is BrickWall) {
-                    <div class="brick" style="left: @arena.grid[i, j].GetStartX()%; top: @arena.grid[i, j].GetStartY()%; width: @arena.grid[i, j].GetLength()%px; height: @arena.grid[i, j].GetLength()%px;"></div>
-                }
-                else if (arena.grid[i, j] is Fire) {
-                    <div class="explosion" style="left: @(i*10)%; top: @(j*10)%; width: @arena.grid[i, j].GetLength()%px; height: @arena.grid[i, j].GetLength()%px;"></div>
-                }
-                else if (arena.grid[i, j] is SpeedPoweerUp) {
-                    <div class="powerup" style="left: @(i*10)%; top: @(j*10)%; width: @arena.grid[i, j].GetLength()%px; height: @arena.grid[i, j].GetLength()%px;"></div>
-                }
-            }
-        }
-
-
-    </div>
-    <div class="scoreboard">
-        <table id="scoreboard">
-            <thead>
-                <tr>
-                    <th>Scoreboard</th>
-                </tr>
-            </thead>
-            <tbody>
-
-
-                @foreach (var player in arena.players)
+                @if (!bomb.Exploded)
                 {
-                    <tr>
-                        @if (player.ConnectionId == hubConnection.ConnectionId)
-                        {
-                            <td><u><b>@player.Name :</b></u></td>
-                        }
-                        else
-                        {
-                            <td>@player.Name : </td>
-                        }
-                        <th>@player.Points</th>
-                    </tr>
+                    <div class="bomb" style="top: @bomb.StartY%; left: @bomb.StartX%;"></div>
                 }
+
+            }
+            @foreach (var bomb in specialBombs)
+            {
+                <div class="specialBomb" style="top: @bomb.StartY%; left: @bomb.StartX%;"></div>
+            }
+            @for (int i = 0; i < 10; i++)
+            {
+                @for (int j = 0; j < 10; j++)
+                {
+                    if (arena.grid[i, j] is Box)
+                    {
+                        <div class="box" style="left: @arena.grid[i, j].GetStartX()%; top: @arena.grid[i, j].GetStartY()%; width: @arena.grid[i, j].GetLength()%px; height: @arena.grid[i, j].GetLength()%px;"></div>
+                    }
+                    else if (arena.grid[i, j] is BrickWall)
+                    {
+                        <div class="brick" style="left: @arena.grid[i, j].GetStartX()%; top: @arena.grid[i, j].GetStartY()%; width: @arena.grid[i, j].GetLength()%px; height: @arena.grid[i, j].GetLength()%px;"></div>
+                    }
+                    else if (arena.grid[i, j] is Fire)
+                    {
+                        <div class="explosion" style="left: @(i*10)%; top: @(j*10)%; width: @arena.grid[i, j].GetLength()%px; height: @arena.grid[i, j].GetLength()%px;"></div>
+                    }
+                    else if (arena.grid[i, j] is SpeedPoweerUp)
+                    {
+                        <div class="powerup" style="left: @(i*10)%; top: @(j*10)%; width: @arena.grid[i, j].GetLength()%px; height: @arena.grid[i, j].GetLength()%px;"></div>
+                    }
+                }
+            }
+
+
+        </div>
+        <div class="scoreboard">
+            <table id="scoreboard">
+                <thead>
+                    <tr>
+                        <th>Scoreboard</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+
+                    @foreach (var player in arena.players)
+                    {
+                        <tr>
+                            @if (player.ConnectionId == hubConnection.ConnectionId)
+                            {
+                                <td><u><b>@player.Name :</b></u></td>
+                            }
+                            else
+                            {
+                                <td>@player.Name : </td>
+                            }
+                            <th>@player.Points</th>
+                        </tr>
+                    }
 
                 </tbody>
             </table>
@@ -203,9 +207,9 @@ else
             .WithUrl(Navigation.ToAbsoluteUri("/arenahub"))
             .Build();
 
-        hubConnection.On<List<Player>>("AssignPlayer", (existingPlayers) =>
+        hubConnection.On<List<Player>>("AssignPlayer", async (existingPlayers) =>
         {
-            
+            await JS.InvokeVoidAsync("Explosion");
             arena.players = existingPlayers;
             playerJoined = true;
             StateHasChanged();
@@ -213,7 +217,6 @@ else
 
         hubConnection.On<Player, PlayerObserver>("PlayerJoined", (player, playerObserver) =>
         {
-            
             playerObserverer = playerObserver;
             arena.players.Add(player);
             StateHasChanged();
@@ -229,13 +232,19 @@ else
         hubConnection.On<string>("UpdatedArena", (temp) =>
         {
             arena = getArena(temp);
+            arena = cleanArena();
             StateHasChanged();
         });
+
+        hubConnection.On("GameOver", () =>
+        {
+            Navigation.NavigateTo("/Gameover", forceLoad: true);
+        });
+
         hubConnection.On<List<Bomb>>("AllBombs", async (newBombs) =>
         {
             arena.bombs = newBombs;
             await hubConnection.SendAsync("HandleExplosion", SerializeArena());
-            await JS.InvokeVoidAsync("Explosion");
             StateHasChanged();
         });
 
@@ -309,52 +318,71 @@ else
 
         if (interpreter.Interpret(context))
         {
-
             swearWordSubmitted = true;
         }
         else
         {
-              await hubConnection.SendAsync("SetName", name);
-
-
+            await hubConnection.SendAsync("SetName", name);
             hubConnection.On<List<string>>("SetName", (names) =>
         {
             lobbyNames = names;
             StateHasChanged();
+
             if (lobbyNames.Count(s => s == name) == 1)
             {
                 swearWordSubmitted = false;
-
                 nameSubmited = true;
-               
             }
             else
             {
                 nameExists = true;
-
             }
         });
-
-
         }
     }
     private async Task JoinArena()
     {
         if (hubConnection is not null && !playerJoined)
         {
-
             playerJoined = true;
             await hubConnection.SendAsync("JoinArena", name, randomBackground);
         }
     }
 
+    private Arena cleanArena()
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            for (int j = 0; j < 10; j++)
+            {
+                if (arena.grid[i, j] is Fire)
+                {
+                    if ((DateTime.Now - (arena.grid[i, j] as Fire).timePlaced).TotalMilliseconds >= 1500)
+                    {
+                        if (arena.powerups[i, j] == 1)
+                        {
+                            IStructure powerup = new SpeedPoweerUp();
+                            arena.grid[i, j] = powerup;
+                        }
+                        else
+                        {
+                            arena.grid[i, j] = null;
+                        }
+                    }
+                }
+            }
+        }
+
+        return arena;
+    }
+
     [JSInvokable("KeyDown")]
     public async Task KeyDown(KeyboardEventArgs e)
     {
-        if (hubConnection is not null && playerJoined && arena.players.Count >= 2 && !subject.Paused)
+        //if (hubConnection is not null && playerJoined && arena.players.Count >= 2 && !subject.Paused)
+        if (hubConnection is not null && playerJoined && !subject.Paused)
         {
             var player = getConnectedPlayer();
-            Console.WriteLine(SerializeArena());
             await hubConnection.SendAsync("MovePlayer", player, SerializeArena(), e);
             await hubConnection.SendAsync("PlaceBomb", player, SerializeArena(), e);
 

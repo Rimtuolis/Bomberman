@@ -68,6 +68,8 @@ public class ArenaHub : Hub, IArenaHub
 		if (e != null)
 		{
 			Arena tempArena = getArena(arena);
+			//tempArena = cleanArena(tempArena);
+
 			IMovement movement = CreateMovement(e);
 			changeLocation(movement, player, tempArena);
 			PlayerManager.EditPlayer(player);
@@ -114,10 +116,7 @@ public class ArenaHub : Hub, IArenaHub
 				PlayerManager.Instance.IncrementScore(player, 5);
 				tempArena.players = PlayerManager.Players.Values.ToList();
 
-				Console.WriteLine(bomb.StartX + " - " + bomb.StartY);
-				Console.WriteLine(player.ConnectionId + " : " + PlayerManager.Instance.GetScore(player) + " : " + player.Points);
-				tempArena = cleanArena(tempArena);
-
+				Console.WriteLine($"Padejo: {Context.ConnectionId}");
 				await Clients.All.SendAsync("UpdatedArena", SerializeArena(tempArena));
 
 				break;
@@ -179,7 +178,7 @@ public class ArenaHub : Hub, IArenaHub
         }
 
 
-		Console.WriteLine($"x:{player.Left + movement.Dx}  y:{player.Top + movement.Dy}");
+		//Console.WriteLine($"x:{player.Left + movement.Dx}  y:{player.Top + movement.Dy}");
 		
 		//keturios puses
 		bool legalMove = (arena.grid[valueX/10, valueY/10] == null || arena.grid[valueX / 10, valueY / 10] is SpeedPoweerUp)
@@ -222,8 +221,9 @@ public class ArenaHub : Hub, IArenaHub
 
 	public async Task SendBombsAll()
 	{
-		if (BombManager.GetBombs().Exists(n => n.Exploded == true && n.viewed == false)) {
-			await _context.Clients.All.SendAsync("AllBombs", BombManager.GetBombs());
+		if (BombManager.GetBombs().Exists(n => n.Exploded && !n.viewed)) {
+			Bomb bomb = BombManager.GetBombs().First(n => n.Exploded && !n.viewed);
+			await _context.Clients.Client(bomb.Id!).SendAsync("AllBombs", BombManager.GetBombs());
 		} 
 
 	}
@@ -256,6 +256,8 @@ public class ArenaHub : Hub, IArenaHub
 	public async Task HandleExplosion(string arena)
 	{
 		Arena tempArena = getArena(arena);
+		Console.WriteLine($"Atejo: {Context.ConnectionId}");
+
 		foreach (var bomb in BombManager.GetBombs()) { 
 
 			if(bomb.Exploded && !bomb.viewed)
@@ -289,17 +291,32 @@ public class ArenaHub : Hub, IArenaHub
                             {
 								tempArena.powerups[i - length + x, j - length + y] = 1;
                             }
+							if (tempArena.grid[i - length + x, j - length + y] is BrickWall) {
+								continue;
+							}
                             IStructure fire = new Fire();
+
+							List<Player> damagedPlayers = tempArena.players.FindAll(n => Math.Abs(n.Left / 10 - i + length - x) == 0 && Math.Abs(n.Top / 10 - j + length - y) == 0);
+
+							damagedPlayers.ForEach(async player =>
+							{
+								await _context.Clients.Client(player.ConnectionId!).SendAsync("GameOver");
+								PlayerManager.RemovePlayer(player);
+							});
+
 							tempArena.grid[i - length + x, j - length + y] = fire;
                         }
 					}
 				}
+				Console.WriteLine($"Apskaiciavo: {Context.ConnectionId}");
 			}
 		}
 
 		tempArena.bombs = BombManager.GetBombs();
+		tempArena.players = PlayerManager.Instance.GetAllPlayers();
 
 		await Clients.All.SendAsync("UpdatedArena", SerializeArena(tempArena));
+		Console.WriteLine($"Issiunte: {Context.ConnectionId}");
 	}
 
     private Arena getArena(string arena) => JsonConvert.DeserializeObject<Arena>(arena, new JsonSerializerSettings()
