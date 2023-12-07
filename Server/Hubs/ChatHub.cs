@@ -107,6 +107,7 @@ public class ArenaHub : Hub, IArenaHub
 
 				var bomb = new Bomb();
 				bomb.Id = player.ConnectionId;
+				bomb.SetState(new IdleStateBomb());
 
 
 				bomb.placeBomb(player);
