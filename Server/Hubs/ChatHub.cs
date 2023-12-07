@@ -228,31 +228,6 @@ public class ArenaHub : Hub, IArenaHub
 
 	}
 
-	private Arena cleanArena(Arena arena) {
-
-		Arena temp = arena;
-
-		for (int i = 0; i < 10; i++) {
-			for (int j = 0; j < 10; j++) {
-				if (temp.grid[i, j] is Fire) {
-					if ((DateTime.Now - (arena.grid[i, j] as Fire).timePlaced).TotalMilliseconds >= 1500) {
-						if (temp.powerups[i,j] == 1)
-						{
-                            IStructure powerup = new SpeedPoweerUp();
-							temp.grid[i, j] = powerup;
-                        }
-						else
-						{
-							temp.grid[i, j] = null;
-                        }
-                    }
-				}
-			}
-		}
-
-		return temp;
-	}
-
 	public async Task HandleExplosion(string arena)
 	{
 		Arena tempArena = getArena(arena);

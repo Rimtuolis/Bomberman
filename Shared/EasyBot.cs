@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,7 +19,7 @@ namespace BomberGopnik.Shared
 			return (Bot)this.MemberwiseClone();
 		}
 
-		public override void PerformAction(GameLevel level, Player player)
+		public override void PerformAction(Arena arena, Player player)
 		{
 			Random random = new Random();
 			bool legalMove = true;
@@ -47,15 +48,19 @@ namespace BomberGopnik.Shared
 						break;
 				}
 
-				foreach (var brick in level.Bricks)
+				for (int i = 0; i < 10; i++)
 				{
-
-					if (tempLeft >= brick.GetStartX() && tempLeft <= brick.GetStartX() + 6 && tempTop >= brick.GetStartY() && tempTop <= brick.GetStartY() + 6 ||
-						tempLeft >= brick.GetStartX() - 6 && tempLeft <= brick.GetStartX() && tempTop >= brick.GetStartY() - 6 && tempTop <= brick.GetStartY())
+					for (int j = 0; j < 10; j++)
 					{
-						legalMove = false;
+						if (arena.grid[i, j] != null)
+						{
+							if (tempLeft >= arena.grid[i, j].GetStartX() && tempLeft <= arena.grid[i, j].GetStartX() + 6 && tempTop >= arena.grid[i, j].GetStartY() && tempTop <= arena.grid[i, j].GetStartY() + 6 ||
+							tempLeft >= arena.grid[i, j].GetStartX() - 6 && tempLeft <= arena.grid[i, j].GetStartX() && tempTop >= arena.grid[i, j].GetStartY() - 6 && tempTop <= arena.grid[i, j].GetStartY())
+							{
+								legalMove = false;
+							}
+						}
 					}
-
 				}
 
 				if (tempTop >= 6 && tempTop < 94 && tempLeft >= 9 && tempLeft < 94 && legalMove)

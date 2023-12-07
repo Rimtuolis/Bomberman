@@ -12,7 +12,7 @@ namespace BomberGopnik.Shared
 		public int Left { get; set; }
 		public string Color { get; set; }
 
-		public abstract void PerformAction(GameLevel level, Player player);
+		public abstract void PerformAction(Arena arena, Player player);
 		public abstract Bot Clone();
 	}
 }
