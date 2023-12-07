@@ -29,17 +29,19 @@ namespace BomberGopnik.Shared
                 }
                 Task.Run(() =>
                 {
-                    Console.WriteLine("Setting timer");
+                    Console.WriteLine("Setting timer");           
                     Thread.Sleep(3000);
                     if (bombs[bomb.Id].Contains(bomb)) {
-                        bombs[bomb.Id].FirstOrDefault(n => n.Equals(bomb)).Exploded = true;
-					}
+                        bombs[bomb.Id].FirstOrDefault(n => n.Equals(bomb)).Explode();
+                        //  bombs[bomb.Id].FirstOrDefault(n => n.Equals(bomb)).Exploded = true;                    
+                    }
                     Console.WriteLine("Exploding");
 					Task.Run(() =>
 					{
 						Console.WriteLine("Setting timer_2");
 						Thread.Sleep(1500);
-						bombs[bomb.Id].Remove(bomb);
+                        bombs[bomb.Id].FirstOrDefault(n => n.Equals(bomb)).Explode();
+                        bombs[bomb.Id].Remove(bomb);
 						Console.WriteLine("Exploded");
 					});
 				});
