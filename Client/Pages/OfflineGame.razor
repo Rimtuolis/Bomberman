@@ -105,8 +105,10 @@ else
 
     private void StartGame()
     {
+        CollisionMediator collisionMediator = new ConcreteCollisionMediator();
         GameStarted = true;
         player = new Player("", "800000", 50, 50, 0,"Player", "RedPlayer.png");
+        player.SetMediator(collisionMediator);
         Bot hard = new HardBot();
 
         hard.Top = 20;
@@ -121,9 +123,16 @@ else
 
         bots.Add(ez);
         bots.Add(ez.Clone());
+        foreach (var bot in bots)
+        {
+            bot.SetMediator(collisionMediator);
+        }
 
     }
-
+    private void OnPlayerDeath()
+    {
+        Navigation.NavigateTo("/Gameover", forceLoad: true);
+    }
     private async Task PauseArena()
     {
         arenaPaused = !arenaPaused;
@@ -135,6 +144,10 @@ else
         if (GameStarted && !arenaPaused)
         {
             IMovement movement = CreateMovement(e);
+            if(player.Dead)
+            {
+                OnPlayerDeath();
+            }
             handleMovement(movement);
 
         }

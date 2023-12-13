@@ -14,7 +14,15 @@ namespace BomberGopnik.Shared
 			Left = 50;
 			Color = "#008000";
 		}
-		public override Bot Clone()
+        public override void SetMediator(CollisionMediator mediator)
+        {
+            this.mediator = mediator;
+        }
+        public override void CollideWithPlayer(Player player)
+        {
+            mediator.PlayerEnemyCollision(player, this);
+        }
+        public override Bot Clone()
 		{
 			return (Bot)this.MemberwiseClone();
 		}
@@ -29,6 +37,10 @@ namespace BomberGopnik.Shared
 			{
 				MoveTowardsPlayer(level, playerTop, playerLeft);
 			}
+			else
+			{
+				this.CollideWithPlayer(player);
+			}
 			/*else
 			{
 				PlaceBomb();
@@ -38,6 +50,7 @@ namespace BomberGopnik.Shared
 		private void MoveTowardsPlayer(GameLevel level, int playerTop, int playerLeft)
 		{
 			
+
 			if (Top < playerTop)
 			{
 				if (IsMoveValid(level, Top + 5, Left))

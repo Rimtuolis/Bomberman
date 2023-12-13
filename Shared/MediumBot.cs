@@ -13,7 +13,15 @@ namespace BomberGopnik.Shared
 			Left = 50;
 			Color = "#808080";
 		}
-		public override Bot Clone()
+        public override void SetMediator(CollisionMediator mediator)
+        {
+            this.mediator = mediator;
+        }
+        public override void CollideWithPlayer(Player player)
+        {
+            mediator.PlayerEnemyCollision(player, this);
+        }
+        public override Bot Clone()
 		{
 			return (Bot)this.MemberwiseClone();
 		}

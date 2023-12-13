@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 
 namespace BomberGopnik.Shared
 {
@@ -17,6 +18,8 @@ namespace BomberGopnik.Shared
 
 		IBombExplosionStrategy BombExplosionStrategy { get; set; }
 
+		private CollisionMediator mediator;
+
 		public void setBombExplosionStrategy(IBombExplosionStrategy strategy) {
 			BombExplosionStrategy = strategy;
 		}
@@ -24,8 +27,17 @@ namespace BomberGopnik.Shared
 		public List<int[]> executeStrategy() {
 			return BombExplosionStrategy.Explode();
 		}
+        public void SetMediator(CollisionMediator mediator)
+        {
+            this.mediator = mediator;
+        }
 
-		public Player(string connectionId, string color, int top, int left, int points, string name, string skin)
+        public void CollideWithEnemy(Bot enemy)
+        {
+            mediator.PlayerEnemyCollision(this, enemy);
+        }
+
+        public Player(string connectionId, string color, int top, int left, int points, string name, string skin)
 		{
 			ConnectionId = connectionId;
 			Color = color;

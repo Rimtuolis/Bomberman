@@ -8,12 +8,22 @@ namespace BomberGopnik.Shared
 {
     public class EasyBot : Bot
     {
-		public EasyBot() {
+        
+        public EasyBot() {
 			Top = 50;
 			Left = 50;
 			Color = "#800080";
+			
 		}
-		public override Bot Clone()
+        public override void SetMediator(CollisionMediator mediator)
+        {
+            this.mediator = mediator;
+        }
+        public override void CollideWithPlayer(Player player)
+        {
+            mediator.PlayerEnemyCollision(player, this);
+        }
+        public override Bot Clone()
 		{
 			return (Bot)this.MemberwiseClone();
 		}

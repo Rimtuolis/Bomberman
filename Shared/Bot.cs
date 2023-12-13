@@ -11,8 +11,16 @@ namespace BomberGopnik.Shared
 		public int Top { get; set; }
 		public int Left { get; set; }
 		public string Color { get; set; }
+		
+		public CollisionMediator mediator;
 
-		public abstract void PerformAction(GameLevel level, Player player);
+        public abstract void PerformAction(GameLevel level, Player player);
 		public abstract Bot Clone();
-	}
+
+		public abstract void CollideWithPlayer(Player player);
+		public abstract void SetMediator(CollisionMediator mediator);
+
+
+
+    }
 }
