@@ -26,7 +26,7 @@ namespace BomberGopnik.Shared
 		{
 			return (Bot)this.MemberwiseClone();
 		}
-		public override void PerformAction(GameLevel level, Player player)
+		public override void PerformAction(Arena arena, Player player)
 		{
 			int playerTop = player.Top;
 			int playerLeft = player.Left;
@@ -35,7 +35,7 @@ namespace BomberGopnik.Shared
 
 			if (distanceToPlayer > 1)
 			{
-				MoveTowardsPlayer(level, playerTop, playerLeft);
+				MoveTowardsPlayer(arena, playerTop, playerLeft);
 			}
 			else
 			{
@@ -47,13 +47,13 @@ namespace BomberGopnik.Shared
 			}*/
 		}
 
-		private void MoveTowardsPlayer(GameLevel level, int playerTop, int playerLeft)
+		private void MoveTowardsPlayer(Arena arena, int playerTop, int playerLeft)
 		{
 			
 
 			if (Top < playerTop)
 			{
-				if (IsMoveValid(level, Top + 5, Left))
+				if (IsMoveValid(arena, Top + 5, Left))
 				{
 					Top += 5;
 				}
@@ -61,7 +61,7 @@ namespace BomberGopnik.Shared
 			else if (Top > playerTop)
 			{
 				// Move up
-				if (IsMoveValid(level, Top - 5, Left))
+				if (IsMoveValid(arena, Top - 5, Left))
 				{
 					Top -= 5;
 				}
@@ -69,7 +69,7 @@ namespace BomberGopnik.Shared
 			else if (Left < playerLeft)
 			{
 				// Move right
-				if (IsMoveValid(level, Top, Left + 5))
+				if (IsMoveValid(arena, Top, Left + 5))
 				{
 					Left += 5;
 				}
@@ -77,26 +77,30 @@ namespace BomberGopnik.Shared
 			else if (Left > playerLeft)
 			{
 				// Move left
-				if (IsMoveValid(level, Top, Left - 5))
+				if (IsMoveValid(arena, Top, Left - 5))
 				{
 					Left-=5;
 				}
 			}
 		}
 
-		private bool IsMoveValid(GameLevel level, int top, int left)
+		private bool IsMoveValid(Arena arena, int top, int left)
 		{
 			bool legalMove = true;
 
-			foreach (var brick in level.Bricks)
+			for (int i = 0; i < 10; i++)
 			{
-
-				if (left >= brick.GetStartX() && left <= brick.GetStartX() + 6 && top >= brick.GetStartY() && top <= brick.GetStartY() + 6 ||
-					left >= brick.GetStartX() - 6 && left <= brick.GetStartX() && top >= brick.GetStartY() - 6 && top <= brick.GetStartY())
+				for (int j = 0; j < 10; j++)
 				{
-					legalMove = false;
+					if (arena.grid[i, j] != null)
+					{
+						if (left >= arena.grid[i, j].GetStartX() && left <= arena.grid[i, j].GetStartX() + 6 && top >= arena.grid[i, j].GetStartY() && top <= arena.grid[i, j].GetStartY() + 6 ||
+						left >= arena.grid[i, j].GetStartX() - 6 && left <= arena.grid[i, j].GetStartX() && top >= arena.grid[i, j].GetStartY() - 6 && top <= arena.grid[i, j].GetStartY())
+						{
+							legalMove = false;
+						}
+					}
 				}
-
 			}
 			return top >= 6 && top < 94 && left >= 6 && left < 94 && legalMove;
 		}

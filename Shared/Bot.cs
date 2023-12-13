@@ -14,7 +14,7 @@ namespace BomberGopnik.Shared
 		
 		public CollisionMediator mediator;
 
-        public abstract void PerformAction(GameLevel level, Player player);
+        public abstract void PerformAction(Arena arena, Player player);
 		public abstract Bot Clone();
 
 		public abstract void CollideWithPlayer(Player player);

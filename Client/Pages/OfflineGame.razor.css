@@ -26,10 +26,17 @@
     position: relative; /* Position for absolute positioning of players */
 }
 
+.game-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
 .grid-item {
     width: 30px;
     height: 30px;
-    border: 1px solid #000;
+    background: url(grass.png); /* Set the path to your brick sprite */
+    background-color: #cccccc;
 }
 
 .scoreboard {
@@ -38,25 +45,18 @@
     border: 2px solid #73AD21;
     padding: 20px;
     width: 300px;
-    height: 300px;
-    position: absolute;
+    height: 200px;
+    position: relative;
 }
 
 
-/* Optional: Style for a player inside the arena */
-.player {
-    width: 30px;
-    height: 30px;
-    background-color: #ff0000; /* Red player */
-    position: absolute;
-    transition: top 0.1s, left 0.1s;
-}
+
+
 
 .bomb {
-    width: 10px;
-    height: 10px;
-    background-color: #ff0000;
-    border: dotted;
+    width: 30px;
+    height: 30px;
+    background: url(bomb.png); /* Set the path to your brick sprite */
     top: 50%; /* Center vertically */
     left: 50%;
     position: absolute;
@@ -82,14 +82,23 @@
 .brick {
     width: 30px;
     height: 30px;
-    background-color: #AA4A44;
+    background: url(brick.png); /* Set the path to your brick sprite */
+    background-color: #cccccc;
     position: absolute;
 }
 
 .box {
     width: 30px;
     height: 30px;
-    background-color: #966F33;
+    background: url(box.png); /* Set the path to your brick sprite */
+    background-color: #cccccc;
+    position: absolute;
+}
+
+.powerup {
+    width: 30px;
+    height: 30px;
+    background: url(powerup.png); /* Set the path to your brick sprite */
     position: absolute;
 }
 

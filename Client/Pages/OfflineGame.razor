@@ -29,37 +29,67 @@
 }
 
 else
-{<div class="grid-container">
-    @for (int row = 0; row < 10; row++)
-    {
-        @for (int col = 0; col < 10; col++)
-        {
-            <div class="grid-item"></div>
-        }
-    }
+{
+    <div class="game-container">
+        <div class="grid-container">
 
-    <div class="player" style="top: @player.Top%; left: @player.Left%; background-color: @player.Color;"></div>
-    @foreach (var bot in bots)
-    {
-        <div class="player" style="top: @bot.Top%; left: @bot.Left%; background-color: @bot.Color;"></div>
-    }
-    @foreach (var bomb in bombs)
-    {
-        <div class="bomb" style="top: @bomb.StartY%; left: @bomb.StartX%;"></div>
-    }
-    @foreach (var bomb in specialBombs)
-    {
-        <div class="specialBomb" style="top: @bomb.StartY%; left: @bomb.StartX%;"></div>
-    }
-    @foreach (var brick in easyLevel.Bricks)
-    {
-        <div class="brick" style="top: @brick.GetStartX()%; left: @brick.GetStartY()%; width: @brick.GetLength()%px; height: @brick.GetLength()%px;"></div>
-    }
-    @foreach (var box in easyLevel.Boxes)
-    {
-        <div class="box" style="top: @box.GetStartX()%; left: @box.GetStartY()%; width: @box.GetLength()%px; height: @box.GetLength()%px;"></div>
-    }
-</div>
+            @for (int row = 0; row < 10; row++)
+            {
+                @for (int col = 0; col < 10; col++)
+                {
+                    <div class="grid-item"></div>
+                }
+            }
+
+            <div class="player" style="width: 30px; height: 30px; position: absolute; top: @offlineArena.arena.players[0].Top%; left: @offlineArena.arena.players[0].Left%; background-color: @offlineArena.arena.players[0].Color; background: url('@offlineArena.arena.players[0].Skin');">
+                <div class="playerlabel" style="font-size: 10px; color:cyan; text-align: center; transform: translateY(-80%);">
+                    @offlineArena.arena.players[0].Name
+                </div>
+            </div>
+
+            @foreach (var bot in offlineArena.bots)
+            {
+                <div class="player" style="width: 30px; height: 30px; position: absolute; top: @bot.Top%; left: @bot.Left%; background-color: @bot.Color; background: url('@player.Skin');">
+                </div>
+            }
+
+            @foreach (var bomb in arena.bombs)
+            {
+                @if (!bomb.Exploded)
+                {
+                    <div class="bomb" style="top: @bomb.StartY%; left: @bomb.StartX%;"></div>
+                }
+
+            }
+            @foreach (var bomb in specialBombs)
+            {
+                <div class="specialBomb" style="top: @bomb.StartY%; left: @bomb.StartX%;"></div>
+            }
+            @for (int i = 0; i < 10; i++)
+            {
+                @for (int j = 0; j < 10; j++)
+                {
+                    if (arena.grid[i, j] is Box)
+                    {
+                        <div class="box" style="left: @arena.grid[i, j].GetStartX()%; top: @arena.grid[i, j].GetStartY()%; width: @arena.grid[i, j].GetLength()%px; height: @arena.grid[i, j].GetLength()%px;"></div>
+                    }
+                    else if (arena.grid[i, j] is BrickWall)
+                    {
+                        <div class="brick" style="left: @arena.grid[i, j].GetStartX()%; top: @arena.grid[i, j].GetStartY()%; width: @arena.grid[i, j].GetLength()%px; height: @arena.grid[i, j].GetLength()%px;"></div>
+                    }
+                    else if (arena.grid[i, j] is Fire)
+                    {
+                        <div class="explosion" style="left: @(i*10)%; top: @(j*10)%; width: @arena.grid[i, j].GetLength()%px; height: @arena.grid[i, j].GetLength()%px;"></div>
+                    }
+                    else if (arena.grid[i, j] is SpeedPoweerUp)
+                    {
+                        <div class="powerup" style="left: @(i*10)%; top: @(j*10)%; width: @arena.grid[i, j].GetLength()%px; height: @arena.grid[i, j].GetLength()%px;"></div>
+                    }
+                }
+            }
+        </div>
+    </div>
+
     @if (!arenaPaused)
     {
         <button class="pause-button" @onclick="PauseArena">Pause</button>
@@ -67,6 +97,12 @@ else
     else if (arenaPaused)
     {
         <button class="pause-button" @onclick="PauseArena">Unpause</button>
+    }
+    <button class="save-button" @onclick="SaveGame">Save</button>
+
+    @for (int i = 0; i < saves.GetLength(); i++) {
+        int currentIndex = i;
+        <button class="restore-button" @onclick="() => RestoreGame(currentIndex)">Save: @(i + 1)</button>
     }
 }
 
@@ -77,14 +113,16 @@ else
 @code {
     private bool GameStarted = false;
 
-    private IGameLevelBuilder builder = new EasyGameLevelBuilder();
-    private GameLevel easyLevel = new GameLevel();
     private string SelectedDifficulty = "easy";
     private Player player;
     private List<Bot> bots = new List<Bot>();
     private List<Bomb> bombs = new List<Bomb>();
     private List<SpecialBomb> specialBombs = new List<SpecialBomb>();
+    SaveFile saves = new SaveFile();
     private int cnt = 0;
+
+    Arena arena = new Arena();
+    OfflineArena offlineArena;
 
     bool arenaPaused = false;
     private Timer timer;
@@ -96,9 +134,14 @@ else
         timer.Elapsed += TimerElapsed;
         timer.AutoReset = true;
         timer.Enabled = true;
+
+        IGameLevelBuilder builder = new EasyGameLevelBuilder();
+        GameLevel easyLevel = new GameLevel();
         builder.BuildBoxes();
         builder.BuildBricks();
         easyLevel = builder.GetResult();
+        arena = new Arena(easyLevel);
+
         var lDotNetReference = DotNetObjectReference.Create(this);
         await JS.InvokeVoidAsync("GLOBAL.SetDotnetReference", lDotNetReference);
     }
@@ -107,27 +150,38 @@ else
     {
         CollisionMediator collisionMediator = new ConcreteCollisionMediator();
         GameStarted = true;
-        player = new Player("", "800000", 50, 50, 0,"Player", "RedPlayer.png");
-        player.SetMediator(collisionMediator);
-        Bot hard = new HardBot();
 
+        player = new Player("", "800000", 50, 50, 0, "Player", "RedPlayer.png");
+        arena.players.Add(player);
+        player.SetMediator(collisionMediator);
+
+        Bot hard = new HardBot();
         hard.Top = 20;
 
         bots.Add(hard);
         bots.Add(hard.Clone());
 
-        Bot ez = new EasyBot();
+        Bot easy = new EasyBot();
 
-        ez.Top = 80;
-
-
-        bots.Add(ez);
-        bots.Add(ez.Clone());
+        easy.Top = 80;
+        bots.Add(easy);
+        bots.Add(easy.Clone());
         foreach (var bot in bots)
         {
             bot.SetMediator(collisionMediator);
         }
 
+        offlineArena = new OfflineArena(arena, bots);
+    }
+
+    private void PauseArena()
+    {
+        arenaPaused = !arenaPaused;
+    }
+
+    private void SaveGame()
+    {
+        saves.AddSaves(offlineArena.CreateSaveFile());
     }
     private void OnPlayerDeath()
     {
@@ -135,8 +189,13 @@ else
     }
     private async Task PauseArena()
     {
-        arenaPaused = !arenaPaused;
+        Console.WriteLine($"index : {i}");
+        Console.WriteLine($"Offline 1 {offlineArena.arena.players[0].Top} : {offlineArena.arena.players[0].Left}");
+        saves.RestoreGame(i);
+        Console.WriteLine($"Offline 2 {offlineArena.arena.players[0].Top} : {offlineArena.arena.players[0].Left}");
+        StateHasChanged();
     }
+
 
     [JSInvokable("KeyDown")]
     public async Task KeyDown(KeyboardEventArgs e)
@@ -153,43 +212,77 @@ else
         }
     }
 
-    private void handleMovement(IMovement movement) { 
-        int valueX = player.Left + movement.Dx;
-        int valueY = player.Top + movement.Dy;
+    /* public async Task PlaceBomb(Player player, string arena, KeyboardEventArgs e)
+                {
+                switch (e.Code)
+                {
+                case "32":
+
+                var bomb = new Bomb();
+                bomb.placeBomb(player);
+                 await BombManager.Addbomb(bomb);
+                tempArena.bombs.Add(bomb);
+
+                PlayerManager.Instance.IncrementScore(player, 5);
+                tempArena.players = PlayerManager.Players.Values.ToList();
+
+                Console.WriteLine($"Padejo: {Context.ConnectionId}");
+                await Clients.All.SendAsync("UpdatedArena", SerializeArena(tempArena));
+
+            break;
+
+            default: break;
+    }
+
+    }*/
+
+
+    private void handleMovement(IMovement movement)
+    {
+        int valueX = offlineArena.arena.players[0].Left + movement.Dx;
+        int valueY = offlineArena.arena.players[0].Top + movement.Dy;
         bool legalMove = true;
 
-        foreach (var brick in easyLevel.Bricks)
+        
+
+
+        for (int i = 0; i < 10; i++)
         {
-
-            if (valueX >= brick.GetStartX() && valueX <= brick.GetStartX() + 6 && valueY >= brick.GetStartY() && valueY <= brick.GetStartY() + 6 ||
-                valueX >= brick.GetStartX() - 6 && valueX <= brick.GetStartX() && valueY >= brick.GetStartY() - 6 && valueY <= brick.GetStartY())
+            for (int j = 0; j < 10; j++)
             {
-                legalMove = false;
+                if (offlineArena.arena.grid[i, j] != null)
+                {
+                    if (valueX >= offlineArena.arena.grid[i, j].GetStartX() && valueX <= offlineArena.arena.grid[i, j].GetStartX() + 6 && valueY >= offlineArena.arena.grid[i, j].GetStartY() && valueY <= offlineArena.arena.grid[i, j].GetStartY() + 6 ||
+            valueX >= offlineArena.arena.grid[i, j].GetStartX() - 6 && valueX <= offlineArena.arena.grid[i, j].GetStartX() && valueY >= offlineArena.arena.grid[i, j].GetStartY() - 6 && valueY <= offlineArena.arena.grid[i, j].GetStartY())
+                    {
+                        legalMove = false;
+                    }
+                }
             }
-
         }
+
         switch (valueX)
         {
             case < 6:
-                player.Left = 6;
+                offlineArena.arena.players[0].Left = 6;
                 break;
             case > 94:
-                player.Left = 94;
+                offlineArena.arena.players[0].Left = 94;
                 break;
             default:
-                if (legalMove) player.Left = valueX;
+                if (legalMove) offlineArena.arena.players[0].Left = valueX;
                 break;
         }
         switch (valueY)
         {
             case < 6:
-                player.Top = 6;
+                offlineArena.arena.players[0].Top = 6;
                 break;
             case > 94:
-                player.Top = 94;
+                offlineArena.arena.players[0].Top = 94;
                 break;
             default:
-                if (legalMove) player.Top = valueY;
+                if (legalMove) offlineArena.arena.players[0].Top = valueY;
                 break;
         }
     }
@@ -212,10 +305,11 @@ else
     }
     private void Update()
     {
-        if (cnt % 5 == 0 && !arenaPaused) { 
-            foreach (Bot temp in bots)
+        if (cnt % 5 == 0 && !arenaPaused)
+        {
+            foreach (Bot temp in offlineArena.bots)
             {
-                temp.PerformAction(easyLevel, player);
+                temp.PerformAction(offlineArena.arena, player);
             }
         }
 
