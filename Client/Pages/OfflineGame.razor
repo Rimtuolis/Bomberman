@@ -115,7 +115,7 @@ else
 
     private string SelectedDifficulty = "easy";
     private Player player;
-    private List<Bot> bots = new List<Bot>();
+    private List<TemplateBot> bots = new List<TemplateBot>();
     private List<Bomb> bombs = new List<Bomb>();
     private List<SpecialBomb> specialBombs = new List<SpecialBomb>();
     SaveFile saves = new SaveFile();
@@ -155,13 +155,13 @@ else
         arena.players.Add(player);
         player.SetMediator(collisionMediator);
 
-        Bot hard = new HardBot();
+        TemplateBot hard = new HardBot();
         hard.Top = 20;
 
         bots.Add(hard);
         bots.Add(hard.Clone());
 
-        Bot easy = new EasyBot();
+        TemplateBot easy = new EasyBot();
 
         easy.Top = 80;
         bots.Add(easy);
@@ -307,7 +307,7 @@ else
     {
         if (cnt % 5 == 0 && !arenaPaused)
         {
-            foreach (Bot temp in offlineArena.bots)
+            foreach (TemplateBot temp in offlineArena.bots)
             {
                 temp.PerformAction(offlineArena.arena, player);
             }

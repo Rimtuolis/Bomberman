@@ -9,7 +9,7 @@ namespace BomberGopnik.Shared
 {
     public class ConcreteCollisionMediator : CollisionMediator
     {
-        public override void PlayerEnemyCollision(Player player, Bot enemy)
+        public override void PlayerEnemyCollision(Player player, TemplateBot enemy)
         {
             player.Dead = true;
             Console.WriteLine("Avarija");

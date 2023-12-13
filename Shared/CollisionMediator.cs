@@ -8,6 +8,6 @@ namespace BomberGopnik.Shared
 {
     public abstract class CollisionMediator
     {
-        public abstract void PlayerEnemyCollision(Player player, Bot enemy);
+        public abstract void PlayerEnemyCollision(Player player, TemplateBot enemy);
     }
 }

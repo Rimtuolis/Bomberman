@@ -9,9 +9,9 @@ namespace BomberGopnik.Shared
 	public class OfflineArena
 	{
 		public Arena arena { get; set; }
-		public List<Bot> bots { get; set; }
+		public List<TemplateBot> bots { get; set; }
 
-		public OfflineArena(Arena arena, List<Bot> bots)
+		public OfflineArena(Arena arena, List<TemplateBot> bots)
 		{
 			this.arena = arena;
 			this.bots = bots;

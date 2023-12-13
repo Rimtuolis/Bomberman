@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BomberGopnik.Shared
 {
-    public class EasyBot : Bot
+    public class EasyBot : TemplateBot
     {
         
         public EasyBot() {
@@ -24,9 +24,9 @@ namespace BomberGopnik.Shared
         {
             mediator.PlayerEnemyCollision(player, this);
         }
-        public override Bot Clone()
+        public override TemplateBot Clone()
 		{
-			return (Bot)this.MemberwiseClone();
+			return (TemplateBot)this.MemberwiseClone();
 		}
 
 		public override void PerformAction(Arena arena, Player player)

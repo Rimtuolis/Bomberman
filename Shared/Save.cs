@@ -11,9 +11,9 @@ namespace BomberGopnik.Shared
 	{
 		public OfflineArena offlineArena;
 		private Arena arena;
-		private List<Bot> bots;
+		private List<TemplateBot> bots;
 
-		public Save(OfflineArena offlineArena, Arena arena, List<Bot> bots)
+		public Save(OfflineArena offlineArena, Arena arena, List<TemplateBot> bots)
 		{
 			this.offlineArena = offlineArena;
 
@@ -27,7 +27,7 @@ namespace BomberGopnik.Shared
 				TypeNameHandling = TypeNameHandling.Auto
 			});
 
-			this.bots = new List<Bot>(bots); // 
+			this.bots = new List<TemplateBot>(bots); // 
 		}
 
 		public void Restore()
