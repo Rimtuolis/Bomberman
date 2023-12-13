@@ -32,5 +32,5 @@ namespace BomberGopnik.Shared
 		{
 			return StartY;
 		}
-	}
+    }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BomberGopnik.Shared
 {
-    public class Arena
+    public class Arena: IAggregate, IStructure
     {
 		public IStructure[,] grid = new IStructure[10,10];
 
@@ -14,10 +14,11 @@ namespace BomberGopnik.Shared
         public List<Bomb> bombs = new List<Bomb>();
         //public Dictionary<int,List<int>> powerups = new Dictionary<int, List<int>>();
         public int[,] powerups = new int[10,10];
+        List<IStructure> structures = new List<IStructure>();
 
         public Arena(GameLevel level)
         {
-            List<IStructure> structures = level.Boxes.Concat(level.Bricks).ToList();
+            structures = level.Boxes.Concat(level.Bricks).ToList();
 
             foreach (var structure in structures) {
                 int i = structure.GetStartX() / 10;
@@ -32,5 +33,34 @@ namespace BomberGopnik.Shared
         {
             return new ArenaIterator(this);
         }
+        public void AddStructure(IStructure structure)
+        {
+            structures.Add(structure);
+        }
+
+        public void RemoveStructure(IStructure structure)
+        {
+            structures.Remove(structure);
+        }
+        public void Build()
+        {
+            Console.WriteLine("Building the Arena");
+        }
+
+        public int GetStartX()
+        {
+            return 0;
+        }
+
+        public int GetStartY()
+        {
+            return 0;
+        }
+
+        public int GetLength()
+        {
+            return structures.Count;
+        }
+
     }
 }

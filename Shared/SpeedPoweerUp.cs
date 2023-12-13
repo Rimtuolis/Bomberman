@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BomberGopnik.Shared
 {
-    public class SpeedPoweerUp : IStructure
+    public class SpeedPoweerUp : IStructure, IElement
     {
         public int StartX { get; set; }
         public int Length { get; set; }
@@ -29,6 +29,10 @@ namespace BomberGopnik.Shared
         public int GetStartY()
         {
             return StartY;
+        }
+        public void Accept(IVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 }

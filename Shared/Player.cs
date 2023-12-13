@@ -2,7 +2,7 @@
 
 namespace BomberGopnik.Shared
 {
-	public class Player 
+	public class Player : IVisitor
     {
 		public string? ConnectionId { get; set; }
 		public string? Color { get; set; }
@@ -51,6 +51,10 @@ namespace BomberGopnik.Shared
                 Player p = (Player)obj;
                 return p.ConnectionId == this.ConnectionId;
             }
+        }
+        public void Visit(SpeedPoweerUp powerUp)
+        {
+			this.ExtraSpeed = true;
         }
     }
 

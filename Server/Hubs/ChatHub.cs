@@ -171,6 +171,7 @@ public class ArenaHub : Hub, IArenaHub
 	{
         int valueX = player.Left + movement.Dx;
         int valueY = player.Top + movement.Dy;
+		SpeedPoweerUp powerup;
 
         if (player.ExtraSpeed)
 		{
@@ -188,10 +189,12 @@ public class ArenaHub : Hub, IArenaHub
 
 		if(arena.grid[valueX / 10, valueY / 10] is SpeedPoweerUp || arena.grid[(valueX + 5) / 10, (valueY + 5) / 10] is SpeedPoweerUp)
 		{
-			arena.grid[valueX / 10, valueY / 10] = null;
+			powerup = (SpeedPoweerUp)arena.grid[valueX / 10, valueY / 10];
+
+            arena.grid[valueX / 10, valueY / 10] = null;
 			arena.grid[(valueX + 5) / 10, (valueY + 5) / 10] = null;
 			arena.powerups[valueX / 10,valueY / 10] = 0;
-            player.ExtraSpeed = true;
+			player.Visit(powerup);
         }
 
         switch (valueX)
