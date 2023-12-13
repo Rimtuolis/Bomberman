@@ -187,7 +187,7 @@ else
     {
         Navigation.NavigateTo("/Gameover", forceLoad: true);
     }
-    private async Task PauseArena()
+    private void RestoreGame(int i)
     {
         Console.WriteLine($"index : {i}");
         Console.WriteLine($"Offline 1 {offlineArena.arena.players[0].Top} : {offlineArena.arena.players[0].Left}");
