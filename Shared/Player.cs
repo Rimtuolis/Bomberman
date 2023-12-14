@@ -3,7 +3,7 @@ using System.Drawing;
 
 namespace BomberGopnik.Shared
 {
-	public class Player 
+	public class Player : IVisitor
     {
 		public string? ConnectionId { get; set; }
 		public string? Color { get; set; }
@@ -32,7 +32,7 @@ namespace BomberGopnik.Shared
             this.mediator = mediator;
         }
 
-        public void CollideWithEnemy(Bot enemy)
+        public void CollideWithEnemy(TemplateBot enemy)
         {
             mediator.PlayerEnemyCollision(this, enemy);
         }
@@ -63,6 +63,10 @@ namespace BomberGopnik.Shared
                 Player p = (Player)obj;
                 return p.ConnectionId == this.ConnectionId;
             }
+        }
+        public void Visit(SpeedPoweerUp powerUp)
+        {
+            this.ExtraSpeed = true;
         }
     }
 
