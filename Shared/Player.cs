@@ -32,7 +32,7 @@ namespace BomberGopnik.Shared
             this.mediator = mediator;
         }
 
-        public void CollideWithEnemy(Bot enemy)
+        public void CollideWithEnemy(TemplateBot enemy)
         {
             mediator.PlayerEnemyCollision(this, enemy);
         }
