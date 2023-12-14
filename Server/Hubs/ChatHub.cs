@@ -10,6 +10,7 @@ using Microsoft.JSInterop;
 using Newtonsoft.Json;
 using System.Text.Json.Serialization;
 using static System.Net.Mime.MediaTypeNames;
+using System.Drawing;
 
 public class ArenaHub : Hub, IArenaHub
 {
@@ -41,19 +42,21 @@ public class ArenaHub : Hub, IArenaHub
         int playerTop = 50;
         int playerLeft = 50;
         int points = 0;
-        
-        
-        var player = new Player(Context.ConnectionId, playerColor, playerTop, playerLeft, points, name, skin);
+
+		
+		PlayerInfo playerInfo = PlayerManager.getPlayerInfo(playerColor, skin);
+		
+		var player = new Player(Context.ConnectionId, playerTop, playerLeft, points, name, playerInfo);
 
         PlayerManager.AddPlayer(player);
         var playerObserver = new PlayerObserver(player);
 
-		await Clients.Caller.SendAsync("AssignPlayer", PlayerManager.Players.Values.ToList());
-		await Clients.Others.SendAsync("PlayerJoined", player, playerObserver);
-		await Clients.All.SendAsync("ObserverJoined", player);
+		await Clients.Caller.SendAsync("AssignPlayer", SerializePlayers(PlayerManager.Players.Values.ToList()));
+		await Clients.Others.SendAsync("PlayerJoined", SerializePlayer(player), playerObserver);
+		await Clients.All.SendAsync("ObserverJoined", SerializePlayer(player));
 	}
 
-	public async Task PauseArena(PlayerManagerSubject subject, Player player, List<Player> pausedObservers)
+	public async Task PauseArena(PlayerManagerSubject subject, string player, string pausedObservers)
 	{
 		await Clients.All.SendAsync("PauseArena", subject, player, pausedObservers);
 	}
@@ -63,16 +66,17 @@ public class ArenaHub : Hub, IArenaHub
         PlayerManager.AddNames(name);
         await Clients.Caller.SendAsync("SetName", PlayerManager.Instance.GetNames());
     }
-	public async Task MovePlayer(Player player, string arena, KeyboardEventArgs e)
+	public async Task MovePlayer(string player, string arena, KeyboardEventArgs e)
 	{
 		if (e != null)
 		{
 			Arena tempArena = getArena(arena);
+			Player tempPlayer = getPlayer(player);
 			//tempArena = cleanArena(tempArena);
 
 			IMovement movement = CreateMovement(e);
-			changeLocation(movement, player, tempArena);
-			PlayerManager.EditPlayer(player);
+			changeLocation(movement, tempPlayer, tempArena);
+			PlayerManager.EditPlayer(tempPlayer);
 			tempArena.players = PlayerManager.Instance.GetAllPlayers();
 
 			await Clients.All.SendAsync("UpdatedArena", SerializeArena(tempArena));
@@ -97,24 +101,25 @@ public class ArenaHub : Hub, IArenaHub
 
 	bool IsArrowKey(String e) => e.Equals("37") || e.Equals("38") || e.Equals("39") || e.Equals("40");
 
-	public async Task PlaceBomb(Player player, string arena, KeyboardEventArgs e)
+	public async Task PlaceBomb(string player, string arena, KeyboardEventArgs e)
 	{
 		switch (e.Code)
 		{
 			case "32":
 
 				Arena tempArena = getArena(arena);
+				Player tempPlayer = getPlayer(player);
 
 				var bomb = new Bomb();
-				bomb.Id = player.ConnectionId;
+				bomb.Id = tempPlayer.ConnectionId;
 				bomb.SetState(new IdleStateBomb());
 
 
-				bomb.placeBomb(player);
+				bomb.placeBomb(tempPlayer);
 				await BombManager.Addbomb(bomb);
 				tempArena.bombs.Add(bomb);
 
-				PlayerManager.Instance.IncrementScore(player, 5);
+				PlayerManager.Instance.IncrementScore(tempPlayer, 5);
 				tempArena.players = PlayerManager.Players.Values.ToList();
 
 				Console.WriteLine($"Padejo: {Context.ConnectionId}");
@@ -127,17 +132,17 @@ public class ArenaHub : Hub, IArenaHub
 
 	}
 
-	public async Task RemoveSpecialBomb(Player player, KeyboardEventArgs e)
+	public async Task RemoveSpecialBomb(string player, KeyboardEventArgs e)
 	{
 		Receiver receiver = new Receiver();
 		ICommand command = new UndoAddSpecialBombCommand(receiver);
-
+		Player tempPlayer = getPlayer(player);
 		Invoker invoker = new Invoker();
 		switch (e.Code)
 		{
 			case "81":
 				var bomb = new SpecialBomb();
-				bomb.Id = player.ConnectionId;
+				bomb.Id = tempPlayer.ConnectionId;
 				invoker.SetCommand(command);
 				invoker.ExecuteCommand(bomb);
 				await Clients.Caller.SendAsync("PlayerRemovedSpecialBomb", bomb);
@@ -148,16 +153,16 @@ public class ArenaHub : Hub, IArenaHub
 		}
 	}
 
-	public async Task PlaceSpecialBomb(Player player, SpecialBomb bomb, KeyboardEventArgs e)
+	public async Task PlaceSpecialBomb(string player, SpecialBomb bomb, KeyboardEventArgs e)
 	{
 		Receiver receiver = new Receiver();
 		ICommand command = new AddSpecialBombCommand(receiver);
-
+		Player tempPlayer = getPlayer(player);
 		Invoker invoker = new Invoker();
 		switch (e.Code)
 		{
 			case "69":
-				bomb.placeBomb(player);
+				bomb.placeBomb(tempPlayer);
 				invoker.SetCommand(command);
 				invoker.ExecuteCommand(bomb);
 				await Clients.Caller.SendAsync("PlayerPlacedSpecialBomb", bomb);
@@ -294,16 +299,6 @@ public class ArenaHub : Hub, IArenaHub
 		await Clients.All.SendAsync("UpdatedArena", SerializeArena(tempArena));
 		Console.WriteLine($"Issiunte: {Context.ConnectionId}");
 	}
-
-    private Arena getArena(string arena) => JsonConvert.DeserializeObject<Arena>(arena, new JsonSerializerSettings()
-	{
-		TypeNameHandling = TypeNameHandling.Auto
-	});
-
-	private string SerializeArena(Arena arena) => JsonConvert.SerializeObject(arena, new JsonSerializerSettings()
-	{
-		TypeNameHandling = TypeNameHandling.Auto
-	});
 	public override async Task OnDisconnectedAsync(Exception? exception)
 	{
 		if (PlayerManager.Players.ContainsKey(Context.ConnectionId))
@@ -311,7 +306,7 @@ public class ArenaHub : Hub, IArenaHub
 			PlayerManager.Players.Remove(Context.ConnectionId);
 		}
 
-		await Clients.Others.SendAsync("UpdatedArena", PlayerManager.Players.Values.ToList());
+		await Clients.Others.SendAsync("UpdatedArena", "disconnected");
 
 		await base.OnDisconnectedAsync(exception);
 
@@ -322,4 +317,29 @@ public class ArenaHub : Hub, IArenaHub
         await Clients.All.SendAsync("ExecuteJavaScript");
     }
 
+	private Arena getArena(string arena) => JsonConvert.DeserializeObject<Arena>(arena, new JsonSerializerSettings()
+	{
+		TypeNameHandling = TypeNameHandling.Auto
+	});
+
+	private string SerializeArena(Arena arena) => JsonConvert.SerializeObject(arena, new JsonSerializerSettings()
+	{
+		TypeNameHandling = TypeNameHandling.Auto
+	});
+	private string SerializePlayer(Player player) => JsonConvert.SerializeObject(player, new JsonSerializerSettings()
+	{
+		TypeNameHandling = TypeNameHandling.Auto
+	});
+	private Player getPlayer(string player) => JsonConvert.DeserializeObject<Player>(player, new JsonSerializerSettings()
+	{
+		TypeNameHandling = TypeNameHandling.Auto
+	});
+	private string SerializePlayers(List<Player> players) => JsonConvert.SerializeObject(players, new JsonSerializerSettings()
+	{
+		TypeNameHandling = TypeNameHandling.Auto
+	});
+	private List<Player> getPlayers(string players) => JsonConvert.DeserializeObject<List<Player>>(players, new JsonSerializerSettings()
+	{
+		TypeNameHandling = TypeNameHandling.Auto
+	});
 }

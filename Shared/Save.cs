@@ -16,24 +16,40 @@ namespace BomberGopnik.Shared
 		public Save(OfflineArena offlineArena, Arena arena, List<TemplateBot> bots)
 		{
 			this.offlineArena = offlineArena;
+			this.arena = DeepCopyArena(arena);
+			this.bots = DeepCopyBots(bots);
+		}
 
+		public void Restore()
+		{
+			offlineArena.arena = DeepCopyArena(arena);
+			offlineArena.bots = DeepCopyBots(bots);
+		}
+
+
+		private Arena DeepCopyArena(Arena arena) {
 			string tempArena = JsonConvert.SerializeObject(arena, new JsonSerializerSettings()
 			{
 				TypeNameHandling = TypeNameHandling.Auto
 			});
 
-			this.arena = JsonConvert.DeserializeObject<Arena>(tempArena, new JsonSerializerSettings()
+			return JsonConvert.DeserializeObject<Arena>(tempArena, new JsonSerializerSettings()
+			{
+				TypeNameHandling = TypeNameHandling.Auto
+			});
+		}
+
+		private List<TemplateBot> DeepCopyBots(List<TemplateBot> bots)
+		{
+			string tempBots = JsonConvert.SerializeObject(bots, new JsonSerializerSettings()
 			{
 				TypeNameHandling = TypeNameHandling.Auto
 			});
 
-			this.bots = new List<TemplateBot>(bots); // 
-		}
-
-		public void Restore()
-		{
-			offlineArena.arena = arena;
-			offlineArena.bots = bots;
+			return JsonConvert.DeserializeObject<List<TemplateBot>>(tempBots, new JsonSerializerSettings()
+			{
+				TypeNameHandling = TypeNameHandling.Auto
+			});
 		}
 	}
 }

@@ -49,7 +49,7 @@
             @foreach (var player in arena.players)
             {
 
-                <div class="player" style="width: 30px; height: 30px; position: absolute; top: @player.Top%; left: @player.Left%; background-color: @player.Color; background: url('@player.Skin');">
+                <div class="player" style="width: 30px; height: 30px; position: absolute; top: @player.Top%; left: @player.Left%; background-color: @player.PlayerInfo.Color; background: url('@player.PlayerInfo.Skin');">
                     <div class="playerlabel" style="font-size: 10px; color:cyan; text-align: center; transform: translateY(-80%);">
                         @player.Name
                     </div>
@@ -207,38 +207,47 @@ else
             .WithUrl(Navigation.ToAbsoluteUri("/arenahub"))
             .Build();
 
-        hubConnection.On<List<Player>>("AssignPlayer", async (existingPlayers) =>
+        hubConnection.On<string>("AssignPlayer", async (existingPlayers) =>
         {
-            await JS.InvokeVoidAsync("Explosion");
-            arena.players = existingPlayers;
+            await JS.InvokeVoidAsync("Explosion");   
+            arena.players = getPlayers(existingPlayers);
             playerJoined = true;
             StateHasChanged();
         });
 
-        hubConnection.On<Player, PlayerObserver>("PlayerJoined", (player, playerObserver) =>
+        hubConnection.On<string, PlayerObserver>("PlayerJoined", (player, playerObserver) =>
         {
             playerObserverer = playerObserver;
-            arena.players.Add(player);
+            arena.players.Add(getPlayer(player));
             StateHasChanged();
         });
 
-        hubConnection.On<Player>("ObserverJoined", (player) =>
+        hubConnection.On<string>("ObserverJoined", (player) =>
         {
-            playerObserverer = new PlayerObserver(player);
-            pausedPlayer = player;
+            playerObserverer = new PlayerObserver(getPlayer(player));
+            pausedPlayer = getPlayer(player);
             StateHasChanged();
         });
 
         hubConnection.On<string>("UpdatedArena", (temp) =>
         {
-            arena = getArena(temp);
-            arena = cleanArena();
-            StateHasChanged();
+            if (!temp.Equals("disconnected"))
+            {
+                arena = getArena(temp);
+                arena = cleanArena();
+                StateHasChanged();
+            }
+            else if(PlayerManager.Instance.GetAllPlayers().Count < 2){ 
+                Navigation.NavigateTo($"/Gameover/{1}", forceLoad: true);
+            }
+
+
+
         });
 
         hubConnection.On("GameOver", () =>
         {
-            Navigation.NavigateTo("/Gameover", forceLoad: true);
+            Navigation.NavigateTo($"/Gameover/{0}", forceLoad: true);
         });
 
         hubConnection.On<List<Bomb>>("AllBombs", async (newBombs) =>
@@ -248,11 +257,11 @@ else
             StateHasChanged();
         });
 
-        hubConnection.On<PlayerManagerSubject, Player, List<Player>>("PauseArena", (newSubject, player, observers) =>
+        hubConnection.On<PlayerManagerSubject, string, string>("PauseArena", (newSubject, player, observers) =>
         {
             subject = newSubject;
-            pausePlayers = observers;
-            newPlayer = player;
+            pausePlayers = getPlayers(observers);
+            newPlayer = getPlayer(player);
             StateHasChanged();
         });
         hubConnection.On<List<SpecialBomb>>("AllSpecialBombs", (newBombs) =>
@@ -287,27 +296,27 @@ else
             subject.Subscribe(playerObserverer);
             subject.NotifyAll(true);
             pausePlayers.Add(tempPlayer);
-            await hubConnection.SendAsync("PauseArena", subject, tempPlayer, pausePlayers);
+            await hubConnection.SendAsync("PauseArena", subject, SerializePlayer(), SerializePlayers(pausePlayers));
         }
         else if (subject.Paused && !pausePlayers.Contains(tempPlayer))
         {
             subject.Subscribe(playerObserverer);
             subject.NotifyAll(true);
             pausePlayers.Add(tempPlayer);
-            await hubConnection.SendAsync("PauseArena", subject, tempPlayer, pausePlayers);
+            await hubConnection.SendAsync("PauseArena", subject, SerializePlayer(), SerializePlayers(pausePlayers));
         }
         else if (subject.Paused && pausePlayers.Contains(tempPlayer) && pausePlayers.Count > 1)
         {
             subject.Unsubscribe(playerObserverer);
             pausePlayers.Remove(tempPlayer);
-            await hubConnection.SendAsync("PauseArena", subject, tempPlayer, pausePlayers);
+            await hubConnection.SendAsync("PauseArena", subject, SerializePlayer(), SerializePlayers(pausePlayers));
         }
         else if (subject.Paused && pausePlayers.Contains(tempPlayer) && pausePlayers.Count <= 1)
         {
             subject.NotifyAll(false);
             pausePlayers.Remove(tempPlayer);
             subject.Unsubscribe(playerObserverer);
-            await hubConnection.SendAsync("PauseArena", subject, tempPlayer, pausePlayers);
+            await hubConnection.SendAsync("PauseArena", subject, SerializePlayer(), SerializePlayers(pausePlayers));
         }
     }
     private async Task PressedSubmit()
@@ -379,22 +388,20 @@ else
     [JSInvokable("KeyDown")]
     public async Task KeyDown(KeyboardEventArgs e)
     {
-        //if (hubConnection is not null && playerJoined && arena.players.Count >= 2 && !subject.Paused)
-        if (hubConnection is not null && playerJoined && !subject.Paused)
+        if (hubConnection is not null && playerJoined && arena.players.Count >= 2 && !subject.Paused)
         {
-            var player = getConnectedPlayer();
-            await hubConnection.SendAsync("MovePlayer", player, SerializeArena(), e);
-            await hubConnection.SendAsync("PlaceBomb", player, SerializeArena(), e);
+            await hubConnection.SendAsync("MovePlayer", SerializePlayer(), SerializeArena(), e);
+            await hubConnection.SendAsync("PlaceBomb", SerializePlayer(), SerializeArena(), e);
 
             ///TODO later
             if (!placedSpecialbomb)
             {
-                await hubConnection.SendAsync("PlaceSpecialBomb", player, e);
+                await hubConnection.SendAsync("PlaceSpecialBomb", SerializePlayer(), e);
             }
 
             if (placedSpecialbomb)
             {
-                await hubConnection.SendAsync("RemoveSpecialBomb", player, e);
+                await hubConnection.SendAsync("RemoveSpecialBomb", SerializePlayer(), e);
             }
         }
     }
@@ -418,6 +425,22 @@ else
             TypeNameHandling = TypeNameHandling.Auto
         });
     private Arena getArena(string arena) => JsonConvert.DeserializeObject<Arena>(arena, new JsonSerializerSettings()
+        {
+            TypeNameHandling = TypeNameHandling.Auto
+        });
+    private string SerializePlayer() => JsonConvert.SerializeObject(getConnectedPlayer(), new JsonSerializerSettings()
+        {
+            TypeNameHandling = TypeNameHandling.Auto
+        });
+    private Player getPlayer(string player) => JsonConvert.DeserializeObject<Player>(player, new JsonSerializerSettings()
+        {
+            TypeNameHandling = TypeNameHandling.Auto
+        });
+    private string SerializePlayers(List<Player> players) => JsonConvert.SerializeObject(players, new JsonSerializerSettings()
+        {
+            TypeNameHandling = TypeNameHandling.Auto
+        });
+    private List<Player> getPlayers(string players) => JsonConvert.DeserializeObject<List<Player>>(players, new JsonSerializerSettings()
         {
             TypeNameHandling = TypeNameHandling.Auto
         });

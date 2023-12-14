@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ namespace BomberGopnik.Shared
 	public class PlayerManager
 	{
 		private static readonly Dictionary<String, Player> players = new Dictionary<string, Player>();
+		private static readonly Dictionary<String, PlayerInfo> playerInfo = new Dictionary<string, PlayerInfo>();
 		private static readonly object locker = new object();
         private static List<string> lobbyNames = new List<string>();
       
@@ -29,9 +31,18 @@ namespace BomberGopnik.Shared
                 lobbyNames.Add(name);
             }
         }
+		public static PlayerInfo getPlayerInfo(string color, string skin)
+		{
+			PlayerInfo? result = playerInfo.GetValueOrDefault(color);
+			if (result == null)
+			{
+				result = new PlayerInfo(color, skin);
+				playerInfo.Add(color, result);
+			}
+			return result;
+		}
 
-       
-        public static void EditPlayer(Player player)
+		public static void EditPlayer(Player player)
 		{
 			players[player.ConnectionId] = player;
 		}

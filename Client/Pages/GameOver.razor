@@ -1,6 +1,6 @@
 ﻿@using BomberGopnik.Shared
 @inject NavigationManager Navigation
-@page "/Gameover"
+@page "/Gameover/{id:int}"
 
 
 <div class="game-over-container">
@@ -11,13 +11,22 @@
 </div>
 
 @code {
+    [Parameter]
+    public int Id { get; set; }
+
     private string DecoratedMessage = "Try again!";
     private string MessageCssClass = "message";
 
-    private IGameOverScreenDecorator decorator = new LosingDecorator();
+
 
     protected override void OnInitialized()
     {
+        IGameOverScreenDecorator decorator;
+        decorator = Id == 1 ? new WinningDecorator() : new LosingDecorator();
+        if (Id == 1) {
+            decorator = new WinningDecorator();
+        }
+
         DecoratedMessage = decorator.DecorateMessage(DecoratedMessage);
         if (decorator is WinningDecorator)
         {

@@ -6,15 +6,16 @@ namespace BomberGopnik.Shared
 	public class Player 
     {
 		public string? ConnectionId { get; set; }
-		public string? Color { get; set; }
+
 		public int Top { get; set; }
 		public int Left { get; set; }
 		public int Points { get; set; }
 		public bool IsPaused { get; set; }
 		public string Name { get; set; }
-		public string Skin { get; set; }
 		public bool ExtraSpeed { get; set; }
 		public bool Dead { get; set; }
+		public PlayerInfo PlayerInfo { get; set; }
+
 
 		IBombExplosionStrategy BombExplosionStrategy { get; set; }
 
@@ -32,15 +33,14 @@ namespace BomberGopnik.Shared
             this.mediator = mediator;
         }
 
-        public void CollideWithEnemy(Bot enemy)
+        public void CollideWithEnemy(TemplateBot enemy)
         {
             mediator.PlayerEnemyCollision(this, enemy);
         }
 
-        public Player(string connectionId, string color, int top, int left, int points, string name, string skin)
+        public Player(string connectionId, int top, int left, int points, string name, PlayerInfo info)
 		{
 			ConnectionId = connectionId;
-			Color = color;
 			Top = top;
 			Left = left;
 			Points = points;
@@ -48,12 +48,10 @@ namespace BomberGopnik.Shared
 			Name = name;
             ExtraSpeed = false;
 			Dead = false;
-
-			Skin = skin;
+			PlayerInfo = info;
 		}
         public override bool Equals(Object obj)
         {
-            //Check for null and compare run-time types.
             if ((obj == null) || !this.GetType().Equals(obj.GetType()))
             {
                 return false;

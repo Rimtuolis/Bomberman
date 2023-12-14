@@ -19,7 +19,5 @@ namespace BomberGopnik.Shared
 		public abstract void CollideWithPlayer(Player player);
 		public abstract void SetMediator(CollisionMediator mediator);
 
-
-
     }
 }
