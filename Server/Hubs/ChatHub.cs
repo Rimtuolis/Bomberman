@@ -174,6 +174,7 @@ public class ArenaHub : Hub, IArenaHub
 	}
 	private void changeLocation(IMovement movement, Player player, Arena arena)
 	{
+        SpeedPoweerUp powerup;
         int valueX = player.Left + movement.Dx;
         int valueY = player.Top + movement.Dy;
 
@@ -191,12 +192,14 @@ public class ArenaHub : Hub, IArenaHub
 					  && (arena.grid[ (valueX + 5) / 10, (valueY + 5) / 10] == null || arena.grid[(valueX + 5) / 10, (valueY + 5) / 10] is SpeedPoweerUp);
 
 
-		if(arena.grid[valueX / 10, valueY / 10] is SpeedPoweerUp || arena.grid[(valueX + 5) / 10, (valueY + 5) / 10] is SpeedPoweerUp)
-		{
-			arena.grid[valueX / 10, valueY / 10] = null;
-			arena.grid[(valueX + 5) / 10, (valueY + 5) / 10] = null;
-			arena.powerups[valueX / 10,valueY / 10] = 0;
-            player.ExtraSpeed = true;
+        if (arena.grid[valueX / 10, valueY / 10] is SpeedPoweerUp || arena.grid[(valueX + 5) / 10, (valueY + 5) / 10] is SpeedPoweerUp)
+        {
+            powerup = (SpeedPoweerUp)arena.grid[valueX / 10, valueY / 10];
+
+            arena.grid[valueX / 10, valueY / 10] = null;
+            arena.grid[(valueX + 5) / 10, (valueY + 5) / 10] = null;
+            arena.powerups[valueX / 10, valueY / 10] = 0;
+            player.Visit(powerup);
         }
 
         switch (valueX)
